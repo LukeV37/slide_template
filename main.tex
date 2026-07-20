@@ -38,7 +38,8 @@
 
 % ---------- slide metadata (edit these) ----------
 \title{Title}
-\author{Author Name}
+\subtitle{Subtitle}
+\author{Luke Vaughan}
 \institute{Argonne National Laboratory}
 \date{\today}
 
@@ -51,13 +52,13 @@
 % ============================================================
 \newcommand{\slideheaderfooter}{%
   \begin{tikzpicture}[remember picture, overlay, shift={(current page.north west)}]
-    % ---- date (bottom-left) ----
+    % ---- date (bottom-left, x=4mm inset from left edge) ----
     \node[anchor=west, inner sep=0pt, font=\fontsize{8}{9}\selectfont]
-      at (1mm, -87.4mm)
+      at (4mm, -87.4mm)
       {\insertdate};
-    % ---- page counter (bottom-right): framenumber / totalframes ----
+    % ---- page counter (bottom-right, x=156mm inset from right edge) ----
     \node[anchor=east, inner sep=0pt, font=\fontsize{8}{9}\selectfont]
-      at (159mm, -87.4mm)
+      at (156mm, -87.4mm)
       {\insertframenumber\,/\,\inserttotalframenumber};
   \end{tikzpicture}%
 }

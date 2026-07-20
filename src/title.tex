@@ -1,25 +1,28 @@
 % ============================================================
 %  Title slide
-%  Layout (all coords from ODF XML, converted to beamer 160x90mm):
+%  Canvas: 160mm x 90mm  (beamer 16:9)
+%  All coordinates: (current page.north west) + (x, -y), y grows downward.
 %
-%  Argonne logo : nw=(19.80, 5.51)mm  w=40.36mm h=16.84mm
-%  ATLAS logo   : nw=(91.73, 8.80)mm  w=53.66mm h=14.52mm
+%  Argonne logo : nw=(15mm, -10mm), width=48mm
 %
-%  Left rect group (diagonal stack, bottom-left of title box):
-%    Red   (top):    nw=(4.36,30.48)  w=29.04 h=11.61
-%    Green (middle): nw=(5.81,31.94)  w=43.56 h=11.58
-%    Blue  (bottom): nw=(7.26,33.39)  w=58.08 h=11.61
+%  ATLAS logo   : nw=(95mm, -2mm), height=26mm
 %
-%  Right rect group (diagonal stack, top-right of title box):
-%    Blue  (bottom): nw=(94.37,39.19) w=58.08 h=11.61
+%  Left rect group (diagonal stack):
+%    Red   (top):    nw=(4.36,30.48)   w=29.04 h=11.61
+%    Green (middle): nw=(5.81,31.94)   w=43.56 h=11.58
+%    Blue  (bottom): nw=(7.26,33.39)   w=58.08 h=11.61
+%
+%  Right rect group (diagonal stack):
+%    Red   (back):   nw=(126.31,42.10) w=29.04 h=11.61
 %    Green (middle): nw=(110.34,40.65) w=43.56 h=11.58
-%    Red   (top):    nw=(126.31,42.10) w=29.04 h=11.61
+%    Blue  (front):  nw=(94.37,39.19)  w=58.08 h=11.61
 %
 %  White title box: nw=(8.68,34.90)  w=142.29 h=14.52
-%  Title font: 32pt (ODF T5 style)
+%  Title font: 24pt bold
 %
-%  Subtitle/author text block: nw=(12.60,63.02) w=135.02 h=19.57
-%  Text font: 18pt
+%  Subtitle: nw=(12.60,58.00), text width=135mm, font=14pt
+%
+%  Author/institute: nw=(12.60,78.00), text width=135mm, font=10pt
 %
 %  Colors: Red=#CD202C  Green=#77B300  Blue=#0081CA
 % ============================================================
@@ -27,15 +30,17 @@
 \begin{frame}[plain]
   \begin{tikzpicture}[remember picture, overlay, shift={(current page.north west)}]
 
-    % ---- Argonne logo (large, upper-left) ----
+    % ---- Argonne logo (upper-left) ----
+    % nw=(15mm, -10mm), width=48mm.
     \node[anchor=north west, inner sep=0pt]
-      at (19.80mm, -5.51mm)
-      {\includegraphics[width=40.36mm]{\argonneLogo}};
+      at (15mm, -10.00mm)
+      {\includegraphics[width=48mm]{\argonneLogo}};
 
     % ---- ATLAS logo (upper-right) ----
+    % nw=(95mm, -2mm), height=26mm.
     \node[anchor=north west, inner sep=0pt]
-      at (91.73mm, -8.80mm)
-      {\includegraphics[width=53.66mm]{\atlasLogo}};
+      at (95mm, -2.00mm)
+      {\includegraphics[height=26mm]{\atlasLogo}};
 
     % ---- Left diagonal rectangle group ----
     % Red (topmost / smallest)
@@ -72,11 +77,18 @@
       at (8.68mm + 142.29mm/2, -34.90mm - 14.52mm/2)
       {\inserttitle};
 
-    % ---- Subtitle / author / institute text block ----
+    % ---- Subtitle text block ----
     \node[anchor=north west,
           font=\fontsize{14}{17}\selectfont,
           text width=135mm, align=center]
-      at (12.60mm, -63.02mm)
+      at (12.60mm, -58.00mm)
+      {\insertsubtitle};
+
+    % ---- Author / institute text block ----
+    \node[anchor=north west,
+          font=\fontsize{10}{13}\selectfont,
+          text width=135mm, align=center]
+      at (12.60mm, -70.00mm)
       {\insertauthor\\[2pt]
        \textit{\insertinstitute}};
 
