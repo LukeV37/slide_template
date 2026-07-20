@@ -1,0 +1,86 @@
+% ============================================================
+%  Title slide
+%  Layout (all coords from ODF XML, converted to beamer 160x90mm):
+%
+%  Argonne logo : nw=(19.80, 5.51)mm  w=40.36mm h=16.84mm
+%  ATLAS logo   : nw=(91.73, 8.80)mm  w=53.66mm h=14.52mm
+%
+%  Left rect group (diagonal stack, bottom-left of title box):
+%    Red   (top):    nw=(4.36,30.48)  w=29.04 h=11.61
+%    Green (middle): nw=(5.81,31.94)  w=43.56 h=11.58
+%    Blue  (bottom): nw=(7.26,33.39)  w=58.08 h=11.61
+%
+%  Right rect group (diagonal stack, top-right of title box):
+%    Blue  (bottom): nw=(94.37,39.19) w=58.08 h=11.61
+%    Green (middle): nw=(110.34,40.65) w=43.56 h=11.58
+%    Red   (top):    nw=(126.31,42.10) w=29.04 h=11.61
+%
+%  White title box: nw=(8.68,34.90)  w=142.29 h=14.52
+%  Title font: 32pt (ODF T5 style)
+%
+%  Subtitle/author text block: nw=(12.60,63.02) w=135.02 h=19.57
+%  Text font: 18pt
+%
+%  Colors: Red=#CD202C  Green=#77B300  Blue=#0081CA
+% ============================================================
+
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture, overlay, shift={(current page.north west)}]
+
+    % ---- Argonne logo (large, upper-left) ----
+    \node[anchor=north west, inner sep=0pt]
+      at (19.80mm, -5.51mm)
+      {\includegraphics[width=40.36mm]{\argonneLogo}};
+
+    % ---- ATLAS logo (upper-right) ----
+    \node[anchor=north west, inner sep=0pt]
+      at (91.73mm, -8.80mm)
+      {\includegraphics[width=53.66mm]{\atlasLogo}};
+
+    % ---- Left diagonal rectangle group ----
+    % Red (topmost / smallest)
+    \fill[argonneRed]
+      (4.36mm, -30.48mm) rectangle ++(29.04mm, -11.61mm);
+    % Green (middle)
+    \fill[argonneGreen]
+      (5.81mm, -31.94mm) rectangle ++(43.56mm, -11.58mm);
+    % Blue (bottommost / largest)
+    \fill[argonneBlue]
+      (7.26mm, -33.39mm) rectangle ++(58.08mm, -11.61mm);
+
+    % ---- Right diagonal rectangle group ----
+    % Draw order matches ODF: red first (behind), green, blue last (in front).
+    % Blue is highest on slide (smallest y), red lowest — blue overlaps red.
+    % Red (largest y / lowest on slide, drawn behind)
+    \fill[argonneRed]
+      (126.31mm, -42.10mm) rectangle ++(29.04mm, -11.61mm);
+    % Green (middle)
+    \fill[argonneGreen]
+      (110.34mm, -40.65mm) rectangle ++(43.56mm, -11.58mm);
+    % Blue (highest on slide / smallest y, drawn in front)
+    \fill[argonneBlue]
+      (94.37mm, -39.19mm) rectangle ++(58.08mm, -11.61mm);
+
+    % ---- White title box (sits on top of rects) ----
+    \fill[white]
+      (8.68mm, -34.90mm) rectangle ++(142.29mm, -14.52mm);
+
+    % ---- Title text (centered in white box) ----
+    \node[anchor=center,
+          font=\fontsize{24}{26}\selectfont\bfseries,
+          text width=138mm, align=center]
+      at (8.68mm + 142.29mm/2, -34.90mm - 14.52mm/2)
+      {\inserttitle};
+
+    % ---- Subtitle / author / institute text block ----
+    \node[anchor=north west,
+          font=\fontsize{14}{17}\selectfont,
+          text width=135mm, align=center]
+      at (12.60mm, -63.02mm)
+      {\insertauthor\\[2pt]
+       \textit{\insertinstitute}};
+
+    % ---- Shared header/footer (date + page counter) ----
+  \end{tikzpicture}
+  \slideheaderfooter
+\end{frame}

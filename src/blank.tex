@@ -1,0 +1,70 @@
+% ============================================================
+%  Content slide template  —  copy-paste this frame for each
+%  new slide.  To add a slide:
+%    1. cp src/blank.tex src/slideNN.tex
+%    2. Add  \input{src/slideNN.tex}  in main.tex
+%    3. Replace the \lipsum placeholder with your content.
+%
+%  Header layout (coords from ODF XML, beamer 160x90mm):
+%    Red bar:   nw=(0.73,0.77)  w=58.08 h=5.81
+%    Green bar: nw=(2.18,2.18)  w=72.59 h=5.81
+%    Blue bar:  nw=(3.63,3.63)  w=87.11 h=5.81
+%    White bar: nw=(5.08,5.08)  w=101.27 h=7.30
+%    Slide title text: 24pt, left-aligned in white bar
+%
+%    Argonne logo: nw=(108.50,2.90) w=19.51 h=7.26
+%    ATLAS logo:   nw=(131.85,3.47) w=24.72 h=7.26
+%
+%  Colors: Red=#CD202C  Green=#77B300  Blue=#0081CA
+% ============================================================
+
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture, overlay, shift={(current page.north west)}]
+
+    % ---- Header: stacked diagonal color bars ----
+    \fill[argonneRed]
+      (0.73mm, -0.77mm) rectangle ++(58.08mm, -5.81mm);
+    \fill[argonneGreen]
+      (2.18mm, -2.18mm) rectangle ++(72.59mm, -5.81mm);
+    \fill[argonneBlue]
+      (3.63mm, -3.63mm) rectangle ++(87.11mm, -5.81mm);
+    % White bar carries the slide title
+    \fill[white]
+      (5.08mm, -5.08mm) rectangle ++(101.27mm, -7.30mm);
+
+    % ---- Slide title text (edit per slide) ----
+    \node[anchor=west,
+          font=\fontsize{16}{18}\selectfont\bfseries,
+          text width=96mm]
+      at (7mm, -5.08mm - 7.30mm/2)
+      {Slide Title};
+
+    % ---- Argonne logo (small, top-right) ----
+    \node[anchor=north west, inner sep=0pt]
+      at (108.50mm, -2.90mm)
+      {\includegraphics[width=19.51mm]{\argonneLogo}};
+
+    % ---- ATLAS logo (small, top-right) ----
+    \node[anchor=north west, inner sep=0pt]
+      at (131.85mm, -3.47mm)
+      {\includegraphics[width=24.72mm]{\atlasLogo}};
+
+  \end{tikzpicture}
+
+  % ---- Content area ----
+  % The colored header occupies roughly the top 12mm.
+  % Place your content below that using a vspace + minipage,
+  % or simply use itemize/enumerate directly.
+  \vspace{14mm}
+  \begin{minipage}[t][68mm][t]{\textwidth}
+    \raggedright
+    % ---- Replace everything below with your content ----
+    \begin{itemize}
+      \item Bullet point one
+      \item Bullet point two
+      \item Bullet point three
+    \end{itemize}
+  \end{minipage}
+
+  \slideheaderfooter
+\end{frame}

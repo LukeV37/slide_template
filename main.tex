@@ -1,0 +1,71 @@
+% ============================================================
+%  Argonne / ATLAS Beamer Template
+%  Aspect ratio: 16:9  (PDF page: 793.45pt x 446.4pt)
+%  Font: TeX Gyre Heros (Helvetica/Arial substitute)
+%
+%  Usage:
+%    latexmk -pdf main.tex
+%    (or: pdflatex main.tex && pdflatex main.tex)
+%
+%  To add a new content slide:
+%    1. Duplicate src/blank.tex -> src/slideNN.tex
+%    2. Add \input{src/slideNN.tex} below.
+% ============================================================
+
+\documentclass[aspectratio=169]{beamer}
+
+% ---------- packages ----------
+\usepackage{tikz}
+\usepackage{graphicx}
+\usepackage[T1]{fontenc}
+\usepackage{tgheros}          % TeX Gyre Heros = metric-compatible Helvetica/Arial
+\renewcommand{\familydefault}{\sfdefault}
+
+% ---------- strip all default Beamer chrome ----------
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{headline}{}
+\setbeamertemplate{footline}{}
+\setbeamertemplate{frametitle}{}
+
+% ---------- exact colors from ODF XML ----------
+\definecolor{argonneRed}{HTML}{CD202C}
+\definecolor{argonneGreen}{HTML}{77B300}
+\definecolor{argonneBlue}{HTML}{0081CA}
+
+% ---------- logo paths ----------
+\newcommand{\argonneLogo}{logos/Argonne-Logo.png}
+\newcommand{\atlasLogo}{logos/ATLAS-Logo.png}
+
+% ---------- slide metadata (edit these) ----------
+\title{Title}
+\author{Author Name}
+\institute{Argonne National Laboratory}
+\date{\today}
+
+% ============================================================
+%  Shared macro: logos + footer (date bottom-left, page counter
+%  bottom-right).  Placed on every slide via TikZ overlay.
+%
+%  Coordinates use beamer's 160mm x 90mm canvas.
+%  (current page.north west) + (x mm, -y mm)  =>  y grows downward.
+% ============================================================
+\newcommand{\slideheaderfooter}{%
+  \begin{tikzpicture}[remember picture, overlay, shift={(current page.north west)}]
+    % ---- date (bottom-left) ----
+    \node[anchor=west, inner sep=0pt, font=\fontsize{8}{9}\selectfont]
+      at (1mm, -87.4mm)
+      {\insertdate};
+    % ---- page counter (bottom-right): framenumber / totalframes ----
+    \node[anchor=east, inner sep=0pt, font=\fontsize{8}{9}\selectfont]
+      at (159mm, -87.4mm)
+      {\insertframenumber\,/\,\inserttotalframenumber};
+  \end{tikzpicture}%
+}
+
+% ============================================================
+\begin{document}
+
+\input{src/title.tex}
+\input{src/blank.tex}
+
+\end{document}
