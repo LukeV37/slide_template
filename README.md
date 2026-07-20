@@ -110,6 +110,31 @@ Any new `src/*.tex` file is automatically picked up as a Make dependency — sav
 | Green | `#77B300` |
 | Blue  | `#0081CA` |
 
+## Previewing Slides as Images
+
+To visually inspect the output, convert the PDF pages to PNG images using `pdftoppm` (part of the `poppler-utils` package):
+
+```bash
+pdftoppm -r 150 tmp/main.pdf tmp/slide -png
+```
+
+This writes one PNG per page into `tmp/`:
+
+```
+tmp/slide-1.png   # page 1 (title slide)
+tmp/slide-2.png   # page 2
+# ...
+```
+
+The `-r 150` flag sets 150 DPI — sufficient for on-screen review. Increase to `-r 300` for higher-fidelity inspection.
+
+Open any page directly:
+
+```bash
+xdg-open tmp/slide-1.png   # Linux desktop
+open tmp/slide-1.png        # macOS
+```
+
 ## Design Notes
 
 - **Canvas:** 160 mm × 90 mm (Beamer `aspectratio=169`)
