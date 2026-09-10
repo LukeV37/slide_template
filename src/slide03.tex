@@ -28,16 +28,15 @@
       (2.18mm, -2.18mm) rectangle ++(72.59mm, -5.81mm);
     \fill[argonneBlue]
       (3.63mm, -3.63mm) rectangle ++(87.11mm, -5.81mm);
-    % White bar carries the slide title
     \fill[white]
       (5.08mm, -5.08mm) rectangle ++(101.27mm, -7.30mm);
 
-    % ---- Slide title text (edit per slide) ----
+    % ---- Slide title text ----
     \node[anchor=west,
-          font=\fontsize{16}{18}\selectfont\bfseries,
+          font=\fontsize{12}{14}\selectfont\bfseries,
           text width=96mm]
       at (7mm, -5.08mm - 7.30mm/2)
-      {Slide Title};
+      {Preprocessing Selections Overview};
 
     % ---- Argonne logo (small, top-right) ----
     \node[anchor=north west, inner sep=0pt]
@@ -51,20 +50,42 @@
 
   \end{tikzpicture}
 
-  % ---- Content area ----
-  % The colored header occupies roughly the top 12mm.
-  % Place your content below that using a vspace + minipage,
-  % or simply use itemize/enumerate directly.
-  \vspace{14mm}
-  \begin{minipage}[t][68mm][t]{\textwidth}
-    \raggedright
-    % ---- Replace everything below with your content ----
+  \vspace{15mm}
+  {\fontsize{8}{9.5}\selectfont
+  \begin{minipage}{0.9\textwidth}
+  \raggedright
+  {\setbeamerfont{itemize/enumerate body}{size=\fontsize{8}{9.5}\selectfont}
+   \setbeamerfont{itemize/enumerate subbody}{size=\fontsize{8}{9.5}\selectfont}
+   \setbeamertemplate{itemize item}{\color{black}-}
+   \setbeamertemplate{itemize subitem}{\color{black}-}
+  \begin{itemize}
+    \item \textbf{Wafer cut}
     \begin{itemize}
-      \item Bullet point one
-      \item Bullet point two
-      \item Bullet point three
+      \item Restrict to wafer w206, manually chosen as a ``well-behaved'' wafer
     \end{itemize}
-  \end{minipage}
+    \item \textbf{Unstable detector cut}
+    \begin{itemize}
+      \item Compute each detector's median, 10th percentile, and 90th percentile over time
+      \item Keep only detectors with finite, positive median
+      \item Require 10th percentile $> 0.9 \times$ median
+      \item Require 90th percentile $< 1.1 \times$ median
+      \item In short: keep detectors within about $\pm 10\%$ of median most of the time
+    \end{itemize}
+    \item \textbf{Bad timestamp cut}
+    \begin{itemize}
+      \item For each kept detector, define valid values as finite and positive
+      \item Compute each detector's 1st percentile from valid samples
+      \item Keep timestamp only if every kept detector is finite, positive, and above its 1st percentile
+      \item In short: drop timestamps where any kept detector is invalid or unusually low
+    \end{itemize}
+  \end{itemize}}
+  \end{minipage}}
+
+  \vspace{4mm}
+  \begin{center}
+  {\fontsize{8}{9.5}\selectfont\itshape
+  Since ``data is data'', how does loosening preprocessing selections affect training of TranAD?}
+  \end{center}
 
   \slideheaderfooter
 \end{frame}

@@ -1,0 +1,46 @@
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture, overlay, shift={(current page.north west)}]
+
+    \fill[argonneRed]
+      (0.73mm, -0.77mm) rectangle ++(58.08mm, -5.81mm);
+    \fill[argonneGreen]
+      (2.18mm, -2.18mm) rectangle ++(72.59mm, -5.81mm);
+    \fill[argonneBlue]
+      (3.63mm, -3.63mm) rectangle ++(87.11mm, -5.81mm);
+    \fill[white]
+      (5.08mm, -5.08mm) rectangle ++(101.27mm, -7.30mm);
+
+    \node[anchor=west,
+          font=\fontsize{12}{14}\selectfont\bfseries,
+          text width=96mm]
+      at (7mm, -5.08mm - 7.30mm/2)
+      {Conclusions};
+
+    \node[anchor=north west, inner sep=0pt]
+      at (100mm, -3mm)
+      {\includegraphics[width=25mm]{\argonneLogo}};
+
+    \node[anchor=north west, inner sep=0pt]
+      at (130mm, 1mm)
+      {\includegraphics[width=25mm]{\atlasLogo}};
+
+  \end{tikzpicture}
+
+  \vspace{17mm}
+  \begin{center}
+    \begin{minipage}{0.84\textwidth}
+      {\fontsize{10}{12}\selectfont
+      {\setbeamertemplate{itemize item}{\color{black}-}
+      \begin{itemize}
+        \item \textbf{Timestamp cuts act as an oracle.} Removing bad data sharpens the reconstruction-error peak. Without them, the signal is washed out.
+        \item \textbf{Loose preprocessing with scaling enabled crashes.} This is a scaling instability, not a physics effect.
+        \item \textbf{Removing scaling shifts the loss landscape} and visibly changes the 2D error histogram.
+        \item \textbf{The yaml pipeline reproduces consistent qualitative behavior,} validating the configurable approach.
+        \item \textbf{Open question:} the yaml no-trim config trains significantly faster despite 2700 channels. Cause is still under investigation.
+      \end{itemize}}
+      }
+    \end{minipage}
+  \end{center}
+
+  \slideheaderfooter
+\end{frame}

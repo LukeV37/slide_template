@@ -1,0 +1,66 @@
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture, overlay, shift={(current page.north west)}]
+
+    \fill[argonneRed]
+      (0.73mm, -0.77mm) rectangle ++(58.08mm, -5.81mm);
+    \fill[argonneGreen]
+      (2.18mm, -2.18mm) rectangle ++(72.59mm, -5.81mm);
+    \fill[argonneBlue]
+      (3.63mm, -3.63mm) rectangle ++(87.11mm, -5.81mm);
+    \fill[white]
+      (5.08mm, -5.08mm) rectangle ++(101.27mm, -7.30mm);
+
+    \node[anchor=west,
+          font=\fontsize{12}{14}\selectfont\bfseries,
+          text width=96mm]
+      at (7mm, -5.08mm - 7.30mm/2)
+      {Trim Config Results};
+
+    \node[anchor=north west, inner sep=0pt]
+      at (100mm, -3mm)
+      {\includegraphics[width=25mm]{\argonneLogo}};
+
+    \node[anchor=north west, inner sep=0pt]
+      at (130mm, 1mm)
+      {\includegraphics[width=25mm]{\atlasLogo}};
+
+  \end{tikzpicture}
+
+  \vspace{14mm}
+  \centering
+  \begin{minipage}[t][68mm][t]{\textwidth}
+    \centering
+    \includegraphics[width=0.29\textwidth,height=34mm,keepaspectratio]{figures/trim/loss_curve.png}
+    \hfill
+    \includegraphics[width=0.29\textwidth,height=34mm,keepaspectratio]{figures/trim/test_error_histogram_1D.png}
+    \hfill
+    \includegraphics[width=0.29\textwidth,height=34mm,keepaspectratio]{figures/trim/test_error_histogram_2D.png}
+
+    \vspace{2mm}
+    {\fontsize{9}{11}\selectfont
+    \begin{center}
+    \begin{minipage}{0.86\textwidth}
+    \begin{minipage}[t]{0.47\textwidth}
+    {\setbeamertemplate{itemize item}{\color{black}-}
+    \begin{itemize}
+      \item Detector trimming enabled
+      \item Timestamp trimming enabled
+      \item Train/test split by years
+    \end{itemize}}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.47\textwidth}
+    {\setbeamertemplate{itemize item}{\color{black}-}
+    \begin{itemize}
+      \item Train: $(7976, 489, 1)$
+      \item Val: $(2652, 489, 1)$
+      \item Test: $(12610, 489, 1)$
+      \item Training time: 00:03:40
+    \end{itemize}}
+    \end{minipage}
+    \end{minipage}
+    \end{center}}
+  \end{minipage}
+
+  \slideheaderfooter
+\end{frame}
