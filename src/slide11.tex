@@ -14,7 +14,7 @@
           font=\fontsize{12}{14}\selectfont\bfseries,
           text width=96mm]
       at (7mm, -5.08mm - 7.30mm/2)
-      {Pipeline Configuration};
+      {Timestep Trim Audit: 0.10 Threshold};
 
     \node[anchor=north west, inner sep=0pt]
       at (100mm, -3mm)
@@ -26,24 +26,18 @@
 
   \end{tikzpicture}
 
-  \vspace{14mm}
+  \vspace{11mm}
   \centering
-  \begin{minipage}{0.88\textwidth}
-    \centering
-    \includegraphics[width=0.42\textwidth,height=38mm,keepaspectratio]{figures/trim_config.jpg}
-    \hspace{0.04\textwidth}
-    \includegraphics[width=0.42\textwidth,height=38mm,keepaspectratio]{figures/no_trim_config.jpg}
-  \end{minipage}
+  \includegraphics[width=0.95\textwidth,height=54mm,keepaspectratio]{figures/spt_timestep_trim_drop010_preprocessing_audit.png}
 
-  \vspace{4mm}
-  {\fontsize{9}{11}\selectfont
+  \vspace{1.5mm}
+  {\fontsize{8}{9.3}\selectfont
   \begin{center}
-  \begin{minipage}{0.88\textwidth}
+  \begin{minipage}{0.86\textwidth}
   {\setbeamertemplate{itemize item}{\color{black}-}
   \begin{itemize}
-    \item Taking inspiration from Joaquin, we can configure the pipeline via yaml.
-    \item Left config: preprocessing cuts are enabled, including timestamp trimming and detector trimming.
-    \item Right config: no trimming is applied; only NaNs are interpolated.
+    \item Train/val kept: 18981 / 6386 (trimmed 1.5\% / 0.6\%).
+    \item Very light trim: only about 1.5\% of train timesteps removed; distribution is nearly identical to the no-cut baseline.
   \end{itemize}}
   \end{minipage}
   \end{center}}

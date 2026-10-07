@@ -14,7 +14,7 @@
           font=\fontsize{12}{14}\selectfont\bfseries,
           text width=96mm]
       at (7mm, -5.08mm - 7.30mm/2)
-      {Outline};
+      {Study Overview};
 
     \node[anchor=north west, inner sep=0pt]
       at (100mm, -3mm)
@@ -27,34 +27,36 @@
   \end{tikzpicture}
 
   \vspace{13mm}
-  {\fontsize{8}{9.5}\selectfont
+  {\fontsize{8.3}{9.7}\selectfont
   \begin{minipage}{0.88\textwidth}
-  {\setbeamerfont{itemize/enumerate body}{size=\fontsize{8}{9.5}\selectfont}
-   \setbeamerfont{itemize/enumerate subbody}{size=\fontsize{8}{9.5}\selectfont}
+  {\setbeamerfont{itemize/enumerate body}{size=\fontsize{8.3}{9.7}\selectfont}
+   \setbeamerfont{itemize/enumerate subbody}{size=\fontsize{8.3}{9.7}\selectfont}
    \setbeamertemplate{itemize item}{\color{black}-}
    \setbeamertemplate{itemize subitem}{\color{black}-}
   \begin{itemize}
-    \item \textbf{Preprocessing cuts} --- define the three default selections applied to SPT data
-    \vspace{1.5mm}
-    \item \textbf{Part 1: Initial study (with scaling)}
+    \item \textbf{Goal}
     \begin{itemize}
-      \item Default, No-Timestamp, and Loose preprocessing --- results and a NaN crash
-      \item Diagnosis: a problematic scaling line identified as the cause of the crash
+      \item Validate the yaml-configured \texttt{BaseDataset} path (PR \href{https://github.com/anl-hep-ai-ml/CrossExperimentalAIDQM/pull/197}{\#197}) against the existing SPT baseline
+      \item Study how timestep trimming changes the train/val phase space
     \end{itemize}
-    \vspace{1.5mm}
-    \item \textbf{Part 2: Rerun without scaling}
+    \vspace{1mm}
+    \item \textbf{Main question}
     \begin{itemize}
-      \item Default, No-Timestamp, and Loose preprocessing repeated with scaling removed
-      \item All three trainings now complete successfully
+      \item What cuts isolate a \emph{well-behaved} operating phase space without over-sculpting the training distribution?
     \end{itemize}
-    \vspace{1.5mm}
-    \item \textbf{Part 3: Configurable yaml pipeline}
+    \vspace{1mm}
+    \item \textbf{PR \#197 summary}
     \begin{itemize}
-      \item Trim-config and No-Trim-config results using a new yaml-driven approach
-      \item Validates the configurable pipeline and highlights an open question on training time
+      \item Moves preprocessing choices into yaml: loader, transforms, split, scaling, NaN policy
+      \item Existing subclass pipelines still work; the configured path is opt-in
+      \item Makes it easy to audit which cuts define the \emph{well-behaved} SPT phase space
     \end{itemize}
-    \vspace{1.5mm}
-    \item \textbf{Conclusions}
+    \vspace{1mm}
+    \item \textbf{Scan setup}
+    \begin{itemize}
+      \item Compare timestep-drop thresholds of 0.01, 0.02, 0.03, 0.04, 0.05, 0.10, 0.50, and 1.00
+      \item Keep test minimally altered while cleaning only train/val; 1.00 is the no-cut baseline
+    \end{itemize}
   \end{itemize}}
   \end{minipage}}
 

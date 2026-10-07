@@ -1,0 +1,47 @@
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture, overlay, shift={(current page.north west)}]
+
+    \fill[argonneRed]
+      (0.73mm, -0.77mm) rectangle ++(58.08mm, -5.81mm);
+    \fill[argonneGreen]
+      (2.18mm, -2.18mm) rectangle ++(72.59mm, -5.81mm);
+    \fill[argonneBlue]
+      (3.63mm, -3.63mm) rectangle ++(87.11mm, -5.81mm);
+    \fill[white]
+      (5.08mm, -5.08mm) rectangle ++(101.27mm, -7.30mm);
+
+    \node[anchor=west,
+          font=\fontsize{12}{14}\selectfont\bfseries,
+          text width=96mm]
+      at (7mm, -5.08mm - 7.30mm/2)
+      {Conclusions};
+
+    \node[anchor=north west, inner sep=0pt]
+      at (100mm, -3mm)
+      {\includegraphics[width=25mm]{\argonneLogo}};
+
+    \node[anchor=north west, inner sep=0pt]
+      at (130mm, 1mm)
+      {\includegraphics[width=25mm]{\atlasLogo}};
+
+  \end{tikzpicture}
+
+  \vspace{16mm}
+  \begin{center}
+    \begin{minipage}{0.86\textwidth}
+      {\fontsize{8.8}{10.6}\selectfont
+      {\setbeamertemplate{itemize item}{\color{black}-}
+      \begin{itemize}
+        \item \textbf{Baseline pipeline behaves as expected.} Stable-channel filtering reduces 303 channels to 113, and quality filtering trims the training set substantially before any threshold scan.
+        \item \textbf{The scan mainly changes the lower tail.} As the trim gets stricter, the lowest-signal timesteps are removed while the mean, median, and upper end of the distribution move much less.
+        \item \textbf{There is a sharp quality break between 4\% and 5\%.} Crossing that line admits around 2500 more train timesteps that visibly worsen the low-signal tail of the distribution.
+        \item \textbf{1\%--4\% are the tight-cleaning regime.} These thresholds remove 20--44\% of train timesteps and keep the data distribution the most well-behaved.
+        \item \textbf{5\%--100\% are comparatively mild.} These settings keep nearly all timesteps but admit the poorer-quality lower tail.
+        \item \textbf{Recommendation.} 4\% looks like the best candidate cut: it sits just before the quality drop and avoids over-sculpting the training set.
+      \end{itemize}}
+      }
+    \end{minipage}
+  \end{center}
+
+  \slideheaderfooter
+\end{frame}

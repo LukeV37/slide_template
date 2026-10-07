@@ -14,7 +14,7 @@
           font=\fontsize{12}{14}\selectfont\bfseries,
           text width=96mm]
       at (7mm, -5.08mm - 7.30mm/2)
-      {No-TimeStamp Results};
+      {Timestep Scan: Config \& Policy};
 
     \node[anchor=north west, inner sep=0pt]
       at (100mm, -3mm)
@@ -26,41 +26,44 @@
 
   \end{tikzpicture}
 
-  \vspace{14mm}
-  \centering
-  \begin{minipage}[t][68mm][t]{\textwidth}
-    \centering
-    \includegraphics[width=0.29\textwidth,height=34mm,keepaspectratio]{figures/no_trim_timestamp_preprocessing_scaled/loss_curve.pdf}
+  \vspace{10mm}
+  \begin{center}
+    \begin{minipage}[c]{0.44\textwidth}
+      \centering
+      \includegraphics[width=\textwidth,height=47mm,keepaspectratio]{figures/transforms_timesteps.jpg}\\[0.5mm]
+      {\fontsize{6.5}{7.5}\selectfont post\_split timestep transforms}
+    \end{minipage}
     \hfill
-    \includegraphics[width=0.29\textwidth,height=34mm,keepaspectratio]{figures/no_trim_timestamp_preprocessing_scaled/spt_validation_error_histogram_1d.png}
-    \hfill
-    \includegraphics[width=0.29\textwidth,height=34mm,keepaspectratio]{figures/no_trim_timestamp_preprocessing_scaled/spt_error_snr_histogram_2d.png}
+    \begin{minipage}[c]{0.52\textwidth}
+      {\fontsize{7.4}{8.9}\selectfont
+      {\setbeamerfont{itemize/enumerate body}{size=\fontsize{7.4}{8.9}\selectfont}
+       \setbeamerfont{itemize/enumerate subbody}{size=\fontsize{7.4}{8.9}\selectfont}
+       \setbeamertemplate{itemize item}{\color{black}-}
+       \setbeamertemplate{itemize subitem}{\color{black}-}
+      \begin{itemize}
+        \item \textbf{Train/val logic}
+        \begin{itemize}
+          \item SNR $<20 \to$ NaN
+          \item Drop timesteps above the NaN-fraction threshold
+          \item Interpolate remaining NaNs per channel
+          \item Robust-scale with the train-fitted scaler
+        \end{itemize}
+        \item \textbf{Test logic}
+        \begin{itemize}
+          \item No thresholding, dropping, or interpolation
+          \item Fill NaN with 0, then apply the same train-fitted scaler
+        \end{itemize}
+      \end{itemize}}
+      }
+    \end{minipage}
+  \end{center}
 
-    \vspace{2mm}
-    {\fontsize{9}{11}\selectfont
-    \begin{center}
-    \begin{minipage}{0.86\textwidth}
-    \begin{minipage}[t]{0.47\textwidth}
-    {\setbeamertemplate{itemize item}{\color{black}-}
-    \begin{itemize}
-      \item Wafer cut included: restrict to wafer w206
-      \item Detector stability cut included
-      \item No timestamp trim applied
-    \end{itemize}}
-    \end{minipage}
-    \hfill
-    \begin{minipage}[t]{0.47\textwidth}
-    {\setbeamertemplate{itemize item}{\color{black}-}
-    \begin{itemize}
-      \item Train: $(19274, 113, 1)$
-      \item Val: $(6423, 113, 1)$
-      \item Test: $(6428, 113, 1)$
-      \item Training time: 00:22:07
-    \end{itemize}}
-    \end{minipage}
-    \end{minipage}
-    \end{center}}
-  \end{minipage}
+  \vspace{1.5mm}
+  \begin{center}
+  {\fontsize{7}{8.3}\selectfont
+  Only the train/val timestep-drop threshold changes across the scan; the test policy is held fixed.\\
+  \href{https://github.com/anl-hep-ai-ml/CrossExperimentalAIDQM/blob/fd5c3da31b389d98656e1f63894bf32a99057724/src/anldq/configs/data_config/spt_timestep_trim.yml}{\texttt{spt\_timestep\_trim.yml}}}
+  \end{center}
 
   \slideheaderfooter
 \end{frame}

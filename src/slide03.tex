@@ -1,27 +1,6 @@
-% ============================================================
-%  Content slide template  —  copy-paste this frame for each
-%  new slide.  To add a slide:
-%    1. cp src/blank.tex src/slideNN.tex
-%    2. Add  \input{src/slideNN.tex}  in main.tex
-%    3. Replace the \lipsum placeholder with your content.
-%
-%  Header layout (coords from ODF XML, beamer 160x90mm):
-%    Red bar:   nw=(0.73,0.77)  w=58.08 h=5.81
-%    Green bar: nw=(2.18,2.18)  w=72.59 h=5.81
-%    Blue bar:  nw=(3.63,3.63)  w=87.11 h=5.81
-%    White bar: nw=(5.08,5.08)  w=101.27 h=7.30
-%    Slide title text: 24pt, left-aligned in white bar
-%
-%    Argonne logo: nw=(108.50,2.90) w=19.51 h=7.26
-%    ATLAS logo:   nw=(131.85,3.47) w=24.72 h=7.26
-%
-%  Colors: Red=#CD202C  Green=#77B300  Blue=#0081CA
-% ============================================================
-
 \begin{frame}[plain]
   \begin{tikzpicture}[remember picture, overlay, shift={(current page.north west)}]
 
-    % ---- Header: stacked diagonal color bars ----
     \fill[argonneRed]
       (0.73mm, -0.77mm) rectangle ++(58.08mm, -5.81mm);
     \fill[argonneGreen]
@@ -31,60 +10,51 @@
     \fill[white]
       (5.08mm, -5.08mm) rectangle ++(101.27mm, -7.30mm);
 
-    % ---- Slide title text ----
     \node[anchor=west,
           font=\fontsize{12}{14}\selectfont\bfseries,
           text width=96mm]
       at (7mm, -5.08mm - 7.30mm/2)
-      {Preprocessing Selections Overview};
+      {Baseline YAML Layout};
 
-    % ---- Argonne logo (small, top-right) ----
     \node[anchor=north west, inner sep=0pt]
       at (100mm, -3mm)
       {\includegraphics[width=25mm]{\argonneLogo}};
 
-    % ---- ATLAS logo (small, top-right) ----
     \node[anchor=north west, inner sep=0pt]
       at (130mm, 1mm)
       {\includegraphics[width=25mm]{\atlasLogo}};
 
   \end{tikzpicture}
 
-  \vspace{15mm}
-  {\fontsize{8}{9.5}\selectfont
-  \begin{minipage}{0.9\textwidth}
-  \raggedright
-  {\setbeamerfont{itemize/enumerate body}{size=\fontsize{8}{9.5}\selectfont}
-   \setbeamerfont{itemize/enumerate subbody}{size=\fontsize{8}{9.5}\selectfont}
-   \setbeamertemplate{itemize item}{\color{black}-}
-   \setbeamertemplate{itemize subitem}{\color{black}-}
-  \begin{itemize}
-    \item \textbf{Wafer cut}
-    \begin{itemize}
-      \item Restrict to wafer w206, manually chosen as a ``well-behaved'' wafer
-    \end{itemize}
-    \item \textbf{Unstable detector cut}
-    \begin{itemize}
-      \item Compute each detector's median, 10th percentile, and 90th percentile over time
-      \item Keep only detectors with finite, positive median
-      \item Require 10th percentile $> 0.9 \times$ median
-      \item Require 90th percentile $< 1.1 \times$ median
-      \item In short: keep detectors within about $\pm 10\%$ of median most of the time
-    \end{itemize}
-    \item \textbf{Bad timestamp cut}
-    \begin{itemize}
-      \item For each kept detector, define valid values as finite and positive
-      \item Compute each detector's 1st percentile from valid samples
-      \item Keep timestamp only if every kept detector is finite, positive, and above its 1st percentile
-      \item In short: drop timestamps where any kept detector is invalid or unusually low
-    \end{itemize}
-  \end{itemize}}
-  \end{minipage}}
-
-  \vspace{4mm}
+  \vspace{10mm}
   \begin{center}
-  {\fontsize{8}{9.5}\selectfont\itshape
-  Since ``data is data'', how does loosening preprocessing selections affect training of TranAD?}
+    \begin{minipage}[t]{0.46\textwidth}
+      \centering
+      \includegraphics[width=\textwidth,height=52mm,keepaspectratio]{figures/loader.jpg}\\[0.5mm]
+      {\fontsize{6.5}{7.5}\selectfont loader}\\[12.0mm]
+      {\fontsize{7}{8.2}\selectfont
+      \begin{minipage}{0.92\textwidth}
+      {\setbeamertemplate{itemize item}{\color{black}-}
+      \begin{itemize}
+        \item Dynamic YAML layout is easy to review at a glance.
+        \item Validated against existing pipeline.
+      \end{itemize}}
+      \end{minipage}}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.46\textwidth}
+      \centering
+      \includegraphics[width=\textwidth,height=31mm,keepaspectratio]{figures/transforms.jpg}\\[0.5mm]
+      {\fontsize{6.5}{7.5}\selectfont transforms (after\_load, post\_split)}\\[1mm]
+      \includegraphics[width=\textwidth,height=15mm,keepaspectratio]{figures/post.jpg}\\[0.5mm]
+      {\fontsize{6.5}{7.5}\selectfont split \& scaling}
+    \end{minipage}
+  \end{center}
+
+  \vspace{1.5mm}
+  \begin{center}
+  {\fontsize{7}{8.3}\selectfont
+  \href{https://github.com/anl-hep-ai-ml/CrossExperimentalAIDQM/blob/fd5c3da31b389d98656e1f63894bf32a99057724/src/anldq/configs/data_config/spt_configured.yml}{\texttt{spt\_configured.yml}}}
   \end{center}
 
   \slideheaderfooter

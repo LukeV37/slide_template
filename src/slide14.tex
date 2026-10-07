@@ -14,7 +14,7 @@
           font=\fontsize{12}{14}\selectfont\bfseries,
           text width=96mm]
       at (7mm, -5.08mm - 7.30mm/2)
-      {Conclusions};
+      {Threshold Scan Summary};
 
     \node[anchor=north west, inner sep=0pt]
       at (100mm, -3mm)
@@ -24,19 +24,31 @@
       at (130mm, 1mm)
       {\includegraphics[width=25mm]{\atlasLogo}};
 
+    \node[anchor=north west, inner sep=0pt]
+      at (5mm, -17mm)
+      {\includegraphics[width=58mm,keepaspectratio]{figures/spt_timestep_trim_threshold_scan_timesteps.png}};
+    \node[anchor=north west, inner sep=0pt]
+      at (66mm, -17mm)
+      {\includegraphics[width=89mm,keepaspectratio]{figures/spt_timestep_trim_threshold_scan_stats.png}};
+    \node[anchor=north, font=\fontsize{6.5}{7.5}\selectfont]
+      at (34mm, -54.3mm)
+      {timesteps removed vs threshold};
+    \node[anchor=north, font=\fontsize{6.5}{7.5}\selectfont]
+      at (110.5mm, -55.1mm)
+      {lower-tail quantile movement};
+
   \end{tikzpicture}
 
-  \vspace{17mm}
+  \vspace{58mm}
   \begin{center}
-    \begin{minipage}{0.84\textwidth}
-      {\fontsize{10}{12}\selectfont
-      {\setbeamertemplate{itemize item}{\color{black}-}
+    \begin{minipage}{0.88\textwidth}
+      {\fontsize{7.3}{8.7}\selectfont
+      {\setbeamerfont{itemize/enumerate body}{size=\fontsize{7.3}{8.7}\selectfont}
+       \setbeamertemplate{itemize item}{\color{black}-}
       \begin{itemize}
-        \item \textbf{Timestamp cuts act as an oracle.} Removing bad data sharpens the reconstruction-error peak. Without them, the signal is washed out.
-        \item \textbf{Loose preprocessing with scaling enabled crashes.} This is a scaling instability, not a physics effect.
-        \item \textbf{Removing scaling shifts the loss landscape} and visibly changes the 2D error histogram.
-        \item \textbf{The yaml pipeline reproduces consistent qualitative behavior,} validating the configurable approach.
-        \item \textbf{Open question:} the yaml no-trim config trains significantly faster despite 2700 channels. Cause is still under investigation.
+        \item Timesteps removed drop sharply below a 5\% threshold; anything looser keeps nearly all data.
+        \item A clear quality break occurs between 4\% and 5\%: crossing that line admits around 2500 extra train timesteps with noticeably worse lower-tail behavior.
+        \item 4\% appears to be the cleanest practical cut: tight enough to remove poor-quality data without discarding too much of the training set.
       \end{itemize}}
       }
     \end{minipage}
