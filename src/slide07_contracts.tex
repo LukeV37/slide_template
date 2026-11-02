@@ -1,0 +1,24 @@
+\begin{frame}[plain,fragile]
+  \slideheader{Dataset contract: BaseDataset}
+
+  \vspace{14mm}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.45\textwidth}
+      {\small Every loader, transform, and split operates on the same canonical in-memory object.}\par
+      \vspace{1.5mm}
+      \begin{itemize}
+        \item Stores arrays in canonical \texttt{(T, C, F)} form
+        \item Keeps timestamps, labels, and metadata aligned
+        \item Carries split tags and preprocessing provenance
+        \item Exposes validation as part of the contract
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.53\textwidth}
+      {\scriptsize Canonical dataset definition:}\par
+      \vspace{1mm}
+      \lstinputlisting[firstline=12,lastline=33,numbers=none]{\corepath/src/preprocessing_core/datasets.py}
+    \end{column}
+  \end{columns}
+
+  \slideheaderfooter
+\end{frame}

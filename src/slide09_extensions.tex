@@ -1,0 +1,33 @@
+\begin{frame}[plain,fragile]
+  \slideheader{Private repositories plug in custom functions}
+
+  \vspace{14mm}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.46\textwidth}
+      {\small Private code extends the framework without modifying the core package.}\par
+      \vspace{2mm}
+      \begin{itemize}
+        \item External module exposes \texttt{register()}
+        \item Runner imports setup modules passed with \texttt{--setup}
+        \item Registration populates public registries
+        \item YAML then uses short names such as \texttt{toy\_npz}
+      \end{itemize}
+
+      \vspace{1mm}
+      {\scriptsize Same registry seam for built-ins and private code.}
+    \end{column}
+    \begin{column}{0.52\textwidth}
+      {\scriptsize External module registration:}\par
+      \vspace{1mm}
+      \lstinputlisting[firstline=5,lastline=12,numbers=none]{\corepath/examples/toy_calibrator/register.py}
+      \vspace{1mm}
+      {\scriptsize Runner import flow:}\par
+      \vspace{1mm}
+      \lstinputlisting[firstline=23,lastline=24,numbers=none]{\corepath/scripts/run_experiment.py}
+      \vspace{1mm}
+      \lstinputlisting[firstline=60,lastline=68,numbers=none]{\corepath/scripts/run_experiment.py}
+    \end{column}
+  \end{columns}
+
+  \slideheaderfooter
+\end{frame}

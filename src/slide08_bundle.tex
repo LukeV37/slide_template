@@ -1,0 +1,25 @@
+\begin{frame}[plain,fragile]
+  \slideheader{Structured output: DatasetBundle}
+
+  \vspace{14mm}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.45\textwidth}
+      {\small The pipeline returns one structured object for downstream consumers.}\par
+      \vspace{1.5mm}
+      \begin{itemize}
+        \item Makes train, val, and test splits explicit
+        \item Carries shared metadata for the whole build
+        \item Clean handoff point to modeling or analysis code
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.53\textwidth}
+      {\scriptsize Final output object:}\par
+      \vspace{1mm}
+      \lstinputlisting[firstline=74,lastline=85,numbers=none]{\corepath/src/preprocessing_core/datasets.py}
+      \vspace{2mm}
+      {\scriptsize Returned from \texttt{PreprocessingPipeline.\_make\_output(...)} after the configured transforms and split policy run.}
+    \end{column}
+  \end{columns}
+
+  \slideheaderfooter
+\end{frame}

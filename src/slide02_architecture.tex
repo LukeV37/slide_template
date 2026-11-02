@@ -1,46 +1,36 @@
 \begin{frame}[plain]
-  \begin{tikzpicture}[remember picture, overlay, shift={(current page.north west)}]
-    \fill[argonneRed] (0.73mm, -0.77mm) rectangle ++(58.08mm, -5.81mm);
-    \fill[argonneGreen] (2.18mm, -2.18mm) rectangle ++(72.59mm, -5.81mm);
-    \fill[argonneBlue] (3.63mm, -3.63mm) rectangle ++(87.11mm, -5.81mm);
-    \fill[white] (5.08mm, -5.08mm) rectangle ++(101.27mm, -7.30mm);
-    \node[anchor=west,font=\fontsize{14}{16}\selectfont\bfseries,text width=96mm]
-      at (7mm, -5.08mm - 7.30mm/2) {Main framework architecture};
-    \node[anchor=north west, inner sep=0pt] at (100mm, -3mm)
-      {\includegraphics[width=25mm]{\argonneLogo}};
-    \node[anchor=north west, inner sep=0pt] at (130mm, 1mm)
-      {\includegraphics[width=25mm]{\atlasLogo}};
-  \end{tikzpicture}
+  \slideheader{Main framework architecture}
 
-  \vspace{16mm}
+  \vspace{11mm}
   \centering
-  \begin{tikzpicture}[x=0.9mm,y=0.9mm]
-    \tikzstyle{box}=[draw=argonneBlue, thick, rounded corners=1.5mm, fill=argonneBlue!6, align=center]
-    \tikzstyle{sidebox}=[draw=argonneGreen!70!black, thick, rounded corners=1.5mm, fill=argonneGreen!10, align=left]
-    \tikzstyle{arrow}=[->, thick, argonneRed]
+  \begin{tikzpicture}[x=1mm,y=1mm,
+      box/.style={draw=argonneBlue, thick, rounded corners=1.5mm, fill=argonneBlue!6,
+                  align=center, inner sep=1.5mm, minimum height=12mm},
+      sidebox/.style={draw=argonneGreen!70!black, thick, rounded corners=1.5mm,
+                      fill=argonneGreen!10, align=center, inner sep=1.5mm, minimum height=16mm},
+      arrow/.style={->, thick, argonneRed}]
 
-    \node[box, minimum width=24mm, minimum height=11mm] (yaml) at (18,-18) {\textbf{YAML}\\\scriptsize pipeline definition};
-    \node[box, minimum width=30mm, minimum height=11mm] (config) at (52,-18) {\textbf{PipelineConfig}\\\scriptsize typed + validated};
-    \node[box, minimum width=36mm, minimum height=11mm] (pipe) at (90,-18) {\textbf{PreprocessingPipeline}\\\scriptsize orchestrates execution};
+    % row 1: config path
+    \node[box, minimum width=28mm] (yaml)    at (14,-22)  {\footnotesize\textbf{YAML}\\[-0.3mm]\tiny pipeline definition};
+    \node[box, minimum width=36mm] (config)  at (60,-22)  {\footnotesize\textbf{PipelineConfig}\\[-0.3mm]\tiny typed + validated};
+    \node[box, minimum width=46mm] (pipe)    at (112,-22) {\footnotesize\textbf{PreprocessingPipeline}\\[-0.3mm]\tiny orchestrates execution};
 
-    \node[box, minimum width=32mm, minimum height=11mm] (dataset) at (60,-42) {\textbf{BaseDataset}\\\scriptsize canonical \,(T, C, F) contract};
-    \node[box, minimum width=29mm, minimum height=11mm] (bundle) at (101,-42) {\textbf{DatasetBundle}\\\scriptsize train / val / test output};
+    % row 2: data path
+    \node[box, minimum width=46mm] (dataset) at (60,-42)  {\footnotesize\textbf{BaseDataset}\\[-0.3mm]\tiny canonical (T, C, F) contract};
+    \node[box, minimum width=46mm] (bundle)  at (112,-42) {\footnotesize\textbf{DatasetBundle}\\[-0.3mm]\tiny train / val / test output};
+
+    % registry seam above the orchestrator
+    \node[sidebox, minimum width=70mm] (registry) at (100,0)
+      {\footnotesize\textbf{Registry seam}\\[-0.3mm]\tiny loaders \,$\cdot$\, transforms \,$\cdot$\, split policies\\[-0.3mm]\tiny short names resolve to callables};
 
     \draw[arrow] (yaml) -- (config);
     \draw[arrow] (config) -- (pipe);
-    \draw[arrow] (pipe) -- (dataset);
+    \draw[arrow] (pipe.south) -- ++(0,-5) -| (dataset.north);
     \draw[arrow] (dataset) -- (bundle);
+    \draw[arrow] (registry.south -| pipe.north) -- (pipe.north);
 
-    \node[sidebox, text width=28mm, minimum height=24mm, anchor=north west] (registry) at (108,-9) {\textbf{Registry seam}\\[1mm]
-      \scriptsize
-      loaders\\
-      transforms\\
-      split policies\\[1mm]
-      short names resolve to callables};
-
-    \draw[arrow] (registry.west) -- ++(-7,0) |- (pipe.east);
-
-    \node[align=left, text width=100mm, anchor=north west] at (8,-60) {\small \textbf{Takeaway:} orchestrator, shared dataset contract, structured output, and an explicit registry seam.};
+    \node[align=left, text width=135mm, anchor=north west] at (0,-50)
+      {\small \textbf{Takeaway:} orchestrator, shared dataset contract, structured output, and an explicit registry seam.};
   \end{tikzpicture}
 
   \slideheaderfooter
