@@ -20,26 +20,82 @@
 \usepackage[T1]{fontenc}
 \usepackage{tgheros}          % TeX Gyre Heros = metric-compatible Helvetica/Arial
 \renewcommand{\familydefault}{\sfdefault}
+\usepackage{xcolor}
+\usepackage[normalem]{ulem}
+\usepackage{listings}
+
+% ---------- code listings ----------
+\lstdefinestyle{pythoncode}{
+  language=Python,
+  basicstyle=\ttfamily\fontsize{6.0}{6.8}\selectfont,
+  keywordstyle=\color{argonneBlue}\bfseries,
+  commentstyle=\color{gray},
+  stringstyle=\color{argonneRed},
+  numbers=left,
+  numberstyle=\fontsize{5.0}{5.6}\selectfont\color{gray},
+  stepnumber=1,
+  numbersep=4pt,
+  showstringspaces=false,
+  breaklines=true,
+  breakatwhitespace=true,
+  columns=fullflexible,
+  keepspaces=true,
+  frame=single,
+  framerule=0.3pt,
+  rulecolor=\color{black!25},
+  xleftmargin=1.2em,
+  framexleftmargin=0.8em,
+  aboveskip=3pt,
+  belowskip=0pt,
+  tabsize=4
+}
+\lstdefinestyle{yamlcode}{
+  basicstyle=\ttfamily\fontsize{6.0}{6.8}\selectfont,
+  numbers=left,
+  numberstyle=\fontsize{5.0}{5.6}\selectfont\color{gray},
+  stepnumber=1,
+  numbersep=4pt,
+  showstringspaces=false,
+  breaklines=true,
+  breakatwhitespace=true,
+  columns=fullflexible,
+  keepspaces=true,
+  frame=single,
+  framerule=0.3pt,
+  rulecolor=\color{black!25},
+  xleftmargin=1.2em,
+  framexleftmargin=0.8em,
+  aboveskip=3pt,
+  belowskip=0pt,
+  tabsize=2
+}
+\lstset{style=pythoncode}
 
 % ---------- strip all default Beamer chrome ----------
 \setbeamertemplate{navigation symbols}{}
 \setbeamertemplate{headline}{}
 \setbeamertemplate{footline}{}
 \setbeamertemplate{frametitle}{}
+\setbeamertemplate{itemize item}{\color{black}\small\textendash}
+\setbeamertemplate{itemize subitem}{\color{black}\scriptsize\textendash}
+\setbeamertemplate{itemize subsubitem}{\color{black}\tiny\textendash}
+\setbeamerfont{itemize/enumerate body}{size=\small}
+\setbeamerfont{itemize/enumerate subbody}{size=\small}
 
 % ---------- exact colors from ODF XML ----------
 \definecolor{argonneRed}{HTML}{CD202C}
 \definecolor{argonneGreen}{HTML}{77B300}
 \definecolor{argonneBlue}{HTML}{0081CA}
+\hypersetup{colorlinks=true, urlcolor=argonneBlue}
 
 % ---------- logo paths ----------
 \newcommand{\argonneLogo}{logos/Argonne-Logo.png}
 \newcommand{\atlasLogo}{logos/ATLAS-Logo.png}
 
 % ---------- slide metadata (edit these) ----------
-\title{Title}
-\subtitle{Subtitle}
-\author{Luke Vaughan}
+\title{Time Series Preprocessing Core}
+\subtitle{A Config-Driven Mini-Framework for Reproducible Preprocessing}
+\author{Amy Bender, JJ Chen, Katie Harrington, Walter Hopkins, David Nguyen, Wei Quan, \texorpdfstring{\uline{Luke Vaughan}}{Luke Vaughan}}
 \institute{Argonne National Laboratory}
 \date{\today}
 
@@ -67,6 +123,14 @@
 \begin{document}
 
 \input{src/title.tex}
-\input{src/blank.tex}
+\input{src/slide01_overview.tex}
+\input{src/slide02_architecture.tex}
+\input{src/slide03_yaml.tex}
+\input{src/slide04_pipeline_runtime.tex}
+\input{src/slide05_schema.tex}
+\input{src/slide06_schema_objects.tex}
+\input{src/slide06_contracts.tex}
+\input{src/slide07_bundle.tex}
+\input{src/slide08_extensions.tex}
 
 \end{document}

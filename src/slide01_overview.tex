@@ -1,0 +1,51 @@
+\begin{frame}[plain,fragile]
+  \begin{tikzpicture}[remember picture, overlay, shift={(current page.north west)}]
+
+    \fill[argonneRed]
+      (0.73mm, -0.77mm) rectangle ++(58.08mm, -5.81mm);
+    \fill[argonneGreen]
+      (2.18mm, -2.18mm) rectangle ++(72.59mm, -5.81mm);
+    \fill[argonneBlue]
+      (3.63mm, -3.63mm) rectangle ++(87.11mm, -5.81mm);
+    \fill[white]
+      (5.08mm, -5.08mm) rectangle ++(101.27mm, -7.30mm);
+
+    \node[anchor=west,
+          font=\fontsize{14}{16}\selectfont\bfseries,
+          text width=96mm]
+      at (7mm, -5.08mm - 7.30mm/2)
+      {What the preprocessing core is};
+
+    \node[anchor=north west, inner sep=0pt]
+      at (100mm, -3mm)
+      {\includegraphics[width=25mm]{\argonneLogo}};
+    \node[anchor=north west, inner sep=0pt]
+      at (130mm, 1mm)
+      {\includegraphics[width=25mm]{\atlasLogo}};
+
+  \end{tikzpicture}
+
+  \vspace{14mm}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.46\textwidth}
+      {\small A config-driven mini-framework for reproducible preprocessing.}\par
+      \vspace{2mm}
+      \begin{itemize}
+        \item Canonical dataset contract for all operations
+        \item Validated YAML drives execution
+        \item Structured train / val / test output
+        \item Public seams for custom code
+      \end{itemize}
+
+      \vspace{1mm}
+      {\scriptsize Key abstractions: \texttt{PipelineConfig}, \texttt{PreprocessingPipeline}, \texttt{BaseDataset}, \texttt{DatasetBundle}.}
+    \end{column}
+    \begin{column}{0.52\textwidth}
+      {\scriptsize Typed config is the entry point from YAML into the framework:}\par
+      \vspace{1mm}
+      \lstinputlisting[firstline=77,lastline=90,numbers=none]{../src/preprocessing_core/config.py}
+    \end{column}
+  \end{columns}
+
+  \slideheaderfooter
+\end{frame}
