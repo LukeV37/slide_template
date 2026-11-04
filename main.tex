@@ -2,28 +2,21 @@
 %  Argonne / ATLAS Beamer Template
 %  Aspect ratio: 16:9  (PDF page: 793.45pt x 446.4pt)
 %  Font: TeX Gyre Heros (Helvetica/Arial substitute)
-%
-%  Usage:
-%    latexmk -pdf main.tex
-%    (or: pdflatex main.tex && pdflatex main.tex)
-%
-%  To add a new content slide:
-%    1. Duplicate src/blank.tex -> src/slideNN.tex
-%    2. Add \input{src/slideNN.tex} below.
-%    (Header comes from \slideheader{Title}; no TikZ copy-paste.)
 % ============================================================
 
 \documentclass[aspectratio=169]{beamer}
 
 % ---------- packages ----------
 \usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
 \usepackage{graphicx}
 \usepackage[T1]{fontenc}
-\usepackage{tgheros}          % TeX Gyre Heros = metric-compatible Helvetica/Arial
+\usepackage{tgheros}
 \renewcommand{\familydefault}{\sfdefault}
 \usepackage{xcolor}
 \usepackage[normalem]{ulem}
 \usepackage{listings}
+\usepackage{amsmath}
 
 % ---------- code listings ----------
 \lstdefinestyle{pythoncode}{
@@ -70,6 +63,40 @@
   belowskip=0pt,
   tabsize=2
 }
+\lstdefinestyle{textcode}{
+  basicstyle=\ttfamily\fontsize{6.0}{6.8}\selectfont,
+  numbers=none,
+  showstringspaces=false,
+  breaklines=true,
+  breakatwhitespace=true,
+  columns=fullflexible,
+  keepspaces=true,
+  frame=single,
+  framerule=0.3pt,
+  rulecolor=\color{black!25},
+  xleftmargin=0.8em,
+  framexleftmargin=0.5em,
+  aboveskip=3pt,
+  belowskip=0pt,
+  tabsize=2
+}
+\lstdefinestyle{bashcode}{
+  basicstyle=\ttfamily\fontsize{5.7}{6.5}\selectfont,
+  numbers=none,
+  showstringspaces=false,
+  breaklines=true,
+  breakatwhitespace=true,
+  columns=fullflexible,
+  keepspaces=true,
+  frame=single,
+  framerule=0.3pt,
+  rulecolor=\color{black!25},
+  xleftmargin=0.8em,
+  framexleftmargin=0.5em,
+  aboveskip=3pt,
+  belowskip=0pt,
+  tabsize=2
+}
 \lstset{style=pythoncode}
 
 % ---------- strip all default Beamer chrome ----------
@@ -83,7 +110,7 @@
 \setbeamerfont{itemize/enumerate body}{size=\small}
 \setbeamerfont{itemize/enumerate subbody}{size=\small}
 
-% ---------- exact colors from ODF XML ----------
+% ---------- colors ----------
 \definecolor{argonneRed}{HTML}{CD202C}
 \definecolor{argonneGreen}{HTML}{77B300}
 \definecolor{argonneBlue}{HTML}{0081CA}
@@ -93,19 +120,23 @@
 \newcommand{\argonneLogo}{logos/Argonne-Logo.png}
 \newcommand{\atlasLogo}{logos/ATLAS-Logo.png}
 
-% ---------- slide metadata (edit these) ----------
-\title{Time Series Preprocessing Core}
-\subtitle{A Config-Driven Mini-Framework for Reproducible Preprocessing}
-\author{Amy Bender, JJ Chen, Katie Harrington, Walter Hopkins, Joaquin Hoya, David Nguyen, Wei Quan, \texorpdfstring{\uline{Luke Vaughan}}{Luke Vaughan}, Azton Wells, Dewen Zhong}
+% ---------- slide metadata ----------
+\title{Nominal-to-Alternate Domain Alignment in SALT/GN3 with Sinkhorn Loss}
+\subtitle{Supervised nominal jet classification plus unsupervised embedding alignment}
+\author{\texorpdfstring{\uline{Luke Vaughan}}{Luke Vaughan}}
 \institute{Argonne National Laboratory}
 \date{\today}
 
+% ---------- shared small helpers ----------
+\newcommand{\repoPath}{../salt_luke}
+\newcommand{\takeaway}[1]{%
+  \vspace{1.4mm}%
+  {\small\color{argonneBlue}\textbf{Key message:} #1}\par%
+}
+\newcommand{\tightlist}{\setlength{\itemsep}{1.2mm}\setlength{\parskip}{0pt}}
+
 % ============================================================
-%  Shared macro: logos + footer (date bottom-left, page counter
-%  bottom-right).  Placed on every slide via TikZ overlay.
-%
-%  Coordinates use beamer's 160mm x 90mm canvas.
-%  (current page.north west) + (x mm, -y mm)  =>  y grows downward.
+%  Shared macro: logos + footer.
 % ============================================================
 \makeatletter
 \newcommand{\setmainframenumber}{%
@@ -116,11 +147,9 @@
 \newcommand{\totalframesdisplay}{\mainframenumber}
 \newcommand{\slideheaderfooter}{%
   \begin{tikzpicture}[remember picture, overlay, shift={(current page.north west)}]
-    % ---- date (bottom-left, x=4mm inset from left edge) ----
     \node[anchor=west, inner sep=0pt, font=\fontsize{8}{9}\selectfont]
       at (4mm, -87.4mm)
       {\insertdate};
-    % ---- page counter (bottom-right, x=156mm inset from right edge) ----
     \node[anchor=east, inner sep=0pt, font=\fontsize{8}{9}\selectfont]
       at (156mm, -87.4mm)
       {\insertframenumber\,/\,\totalframesdisplay};
@@ -128,13 +157,7 @@
 }
 
 % ============================================================
-%  Shared macro: content-slide header (stacked color bars, white
-%  title bar, logos).  Usage inside a frame:  \slideheader{Title}
-%
-%    Red bar:   nw=(0.73,0.77)  w=58.08 h=5.81
-%    Green bar: nw=(2.18,2.18)  w=72.59 h=5.81
-%    Blue bar:  nw=(3.63,3.63)  w=87.11 h=5.81
-%    White bar: nw=(5.08,5.08)  w=101.27 h=7.30
+%  Shared macro: content-slide header.
 % ============================================================
 \newcommand{\slideheader}[1]{%
   \begin{tikzpicture}[remember picture, overlay, shift={(current page.north west)}]
@@ -151,27 +174,13 @@
   \end{tikzpicture}%
 }
 
-% ---------- path to the repo whose source is shown in listings ----------
-% Relative to this directory (slide_template/), where the build runs.
-\newcommand{\corepath}{../Time_Series_Preprocessing_Core}
-
 % ============================================================
 \begin{document}
 
 \input{src/title.tex}
-\input{src/slide00_intro.tex}
-\input{src/slide02_architecture.tex}
-\input{src/slide03_yaml.tex}
-\input{src/slide04_pipeline_config.tex}
-\input{src/slide05_preprocessing_pipeline.tex}
-\input{src/slide06_schema_objects.tex}
-\input{src/slide07_contracts.tex}
-\input{src/slide08_bundle.tex}
-\input{src/slide09_mock_intro.tex}
-\input{src/slide10_mock_plot.tex}
-\input{src/slide11_mock_yaml.tex}
-\input{src/slide12_mock_log.tex}
-\input{src/slide10_conclusion.tex}
-\input{src/slide13_backup_cloc.tex}
+\input{src/sinkhorn_deck.tex}
+\setmainframenumber
+\appendix
+\input{src/sinkhorn_backup.tex}
 
 \end{document}

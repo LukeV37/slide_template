@@ -1,0 +1,119 @@
+\begin{frame}[plain,fragile]
+  \slideheader{Backup: Loss Scheduling Detail}
+
+  \vspace{14mm}
+  \begin{columns}[T,totalwidth=\textwidth]
+    \begin{column}{0.45\textwidth}
+      \begin{lstlisting}[style=pythoncode]
+if epoch < warmup:
+    alignment_scale = 0
+elif epoch < warmup + ramp:
+    alignment_scale increases gradually
+else:
+    alignment_scale = 1
+      \end{lstlisting}
+    \end{column}
+    \begin{column}{0.51\textwidth}
+      \begin{itemize}\tightlist
+        \item Warmup keeps optimization classification-only.
+        \item Ramp avoids abruptly applying the full OT penalty.
+        \item After ramp, configured Sinkhorn \texttt{weight} is fully active.
+      \end{itemize}
+      \vspace{2mm}
+      \begin{center}
+        {\small\textbf{Conceptual objective}}\par
+        \vspace{1mm}
+        {\small $L = L_{\mathrm{CE, nominal}} + \mathrm{weight}\times\mathrm{scale}(t)\times D_{\mathrm{Sinkhorn}}$}
+      \end{center}
+    \end{column}
+  \end{columns}
+
+  \slideheaderfooter
+\end{frame}
+
+\begin{frame}[plain,fragile]
+  \slideheader{Backup: Files Changed}
+
+  \vspace{14mm}
+  \begin{columns}[T,totalwidth=\textwidth]
+    \begin{column}{0.50\textwidth}
+      \begin{lstlisting}[style=textcode]
+salt/modelwrapper.py
+salt/models/SinkhornDomainAlignmentLoss.py
+salt/models/__init__.py
+salt/configs/GN3/GN3_sinkhorn_domain_alignment.yaml
+salt/utils/check_domain_batches.py
+pyproject.toml
+README.md
+      \end{lstlisting}
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      \begin{itemize}\tightlist
+        \item Sinkhorn class lives in its own ground-truth module.
+        \item Wrapper changes are optional and default to existing behavior.
+        \item Config keeps \texttt{source\_label} as metadata only.
+        \item Utility validates H5 ordering at the planned local batch size.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+
+  \slideheaderfooter
+\end{frame}
+
+\begin{frame}[plain,fragile]
+  \slideheader{Backup: Suggested Next Commands}
+
+  \vspace{12mm}
+  \begin{columns}[T,totalwidth=\textwidth]
+    \begin{column}{0.49\textwidth}
+      {\small\textbf{Batch check}}\par
+      \begin{lstlisting}[style=bashcode]
+python salt/utils/check_domain_batches.py \
+  --file /path/to/train.h5 \
+  --domain-label source_label \
+  --batch-size 256 \
+  --min-samples-per-domain 8 \
+  --ignore-tail
+      \end{lstlisting}
+      {\small\textbf{Active Sinkhorn smoke}}\par
+      \begin{lstlisting}[style=bashcode]
+salt fit -c salt/configs/GN3/GN3_sinkhorn_domain_alignment.yaml \
+  --model.alignment_warmup_epochs 0 \
+  --model.alignment_ramp_epochs 1
+      \end{lstlisting}
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      {\small\textbf{Test a checkpoint}}\par
+      \begin{lstlisting}[style=bashcode]
+salt test \
+  -c logs/<run>/config.yaml \
+  --ckpt_path logs/<run>/ckpts/epoch=099-val_loss=....ckpt
+      \end{lstlisting}
+      \vspace{2mm}
+      \begin{itemize}\tightlist
+        \item Use the warmup-end checkpoint as the nominal-only baseline.
+        \item Compare later checkpoints after active alignment.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+
+  \slideheaderfooter
+\end{frame}
+
+\begin{frame}[plain,fragile]
+  \slideheader{Backup: Guidance for Future Agents}
+
+  \vspace{14mm}
+  \begin{itemize}\tightlist
+    \item Keep \texttt{source\_label} out of \texttt{data.variables}.
+    \item Do not duplicate or move \texttt{salt/models/SinkhornDomainAlignmentLoss.py} into \texttt{custom\_losses.py}.
+    \item Treat alternate-domain rows as unlabeled for optimization, even if labels exist in H5.
+    \item Keep the first Sinkhorn study on \texttt{loss\_mode: wsum}.
+    \item Use epoch-based warmup/ramp controls.
+    \item Use Sinkhorn \texttt{weight} as the main alignment-strength knob.
+    \item Confirm the semantic mapping of \texttt{source\_label} values before production training.
+    \item Use the warmup-end checkpoint as the classification-only baseline.
+  \end{itemize}
+
+  \slideheaderfooter
+\end{frame}
