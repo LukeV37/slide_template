@@ -1,10 +1,18 @@
 # Argonne / ATLAS Beamer Slide Template
 
-A LaTeX Beamer presentation template that replicates the official Argonne National Laboratory / ATLAS branded visual style. Produces 16:9 PDF slides with a pixel-perfect layout derived from the original PowerPoint/ODP reference template.
+A minimal LaTeX Beamer template for Argonne National Laboratory / ATLAS branded presentations. It produces 16:9 PDF slides with a clean TikZ-based layout, reusable header/footer macros, and optional examples for common slide patterns.
 
 ## Overview
 
-All Beamer chrome (headers, footers, navigation symbols, frametitle) is stripped and replaced with hand-crafted TikZ overlays that reproduce the Argonne/ATLAS branded slide design — including the signature stacked diagonal color-bar motif in red (`#CD202C`), green (`#77B300`), and blue (`#0081CA`).
+All default Beamer chrome is stripped and replaced with hand-crafted TikZ overlays:
+
+- signature Argonne red (`#CD202C`), green (`#77B300`), and blue (`#0081CA`) color bars
+- Argonne and ATLAS logos
+- consistent date and frame counter footer
+- shared `\slideheader{...}` macro for content slides
+- compact list styling and reusable code-listing styles
+
+The `main` branch is intentionally content-free: it includes only a title slide and one blank content slide by default.
 
 ## Repository Structure
 
@@ -15,27 +23,28 @@ All Beamer chrome (headers, footers, navigation symbols, frametitle) is stripped
 │   └── ATLAS-Logo.png         # ATLAS logo
 ├── src/
 │   ├── title.tex              # Title slide
-│   └── blank.tex              # Content slide template (copy this for new slides)
-├── template/
-│   ├── Argonne_Template.odp   # Original LibreOffice Impress source (design reference)
-│   └── Argonne_Template.pdf   # Rendered reference PDF
+│   ├── blank.tex              # Content slide template (copy this for new slides)
+│   ├── slide_two_column_example.tex  # Optional generic layout example
+│   └── slide_code_example.tex        # Optional generic code/listing example
 ├── tmp/                       # Build output directory (git-ignored)
-├── main.tex                   # Root LaTeX document (entry point)
+├── main.tex                   # Root LaTeX document and shared macros
 └── makefile                   # Build system (GNU Make + latexmk)
 ```
 
 ## Requirements
 
-- **TeX Live 2026** (or later) with the following packages:
+- **TeX Live 2026** or later with:
   - `beamer`
   - `tikz`
   - `graphicx`
   - `fontenc`
-  - `tgheros` (TeX Gyre Heros — Helvetica/Arial-compatible font)
+  - `tgheros`
+  - `listings`
+  - `amsmath`
 - **latexmk**
 - **GNU Make**
 
-The `makefile` expects a local TeX Live installation at `~/Software/texlive/2026/bin/x86_64-linux`. Adjust the `TEXLIVE` variable at the top of `makefile` if your installation is elsewhere.
+The `makefile` expects TeX Live at `~/Software/texlive/2026/bin/x86_64-linux`. Adjust the `TEXLIVE` variable at the top of `makefile` if your installation is elsewhere.
 
 ## Building
 
@@ -43,16 +52,14 @@ The `makefile` expects a local TeX Live installation at `~/Software/texlive/2026
 # Compile to tmp/main.pdf
 make
 
-# Remove all build artifacts
+# Remove build artifacts
 make clean
 ```
 
-You can also compile directly without Make:
+You can also compile directly:
 
 ```bash
-latexmk -pdf main.tex
-# or
-pdflatex main.tex && pdflatex main.tex
+latexmk -pdf -outdir=tmp main.tex
 ```
 
 The output PDF is written to `tmp/main.pdf`.
@@ -63,81 +70,118 @@ Edit the metadata block in `main.tex`:
 
 ```latex
 \title{Title}
+\subtitle{Subtitle}
 \author{Author Name}
 \institute{Argonne National Laboratory}
 \date{\today}
 ```
 
-These values are automatically inserted into the title slide by `\inserttitle`, `\insertauthor`, and `\insertinstitute`.
+These values are inserted into `src/title.tex` using Beamer's `\inserttitle`, `\insertsubtitle`, `\insertauthor`, and `\insertinstitute` macros.
 
 ## Adding a New Slide
 
-1. Copy the content slide template:
+1. Copy the blank content slide:
+
    ```bash
    cp src/blank.tex src/slide02.tex
    ```
 
-2. Add an `\input` line in `main.tex` (after the existing slides):
+2. Add an `\input` line in `main.tex`:
+
    ```latex
    \input{src/slide02.tex}
    ```
 
-3. In `src/slide02.tex`, replace `Slide Title` and the placeholder `itemize` list with your content.
+3. In the new slide file:
+   - set the title with `\slideheader{Your Slide Title}`
+   - replace the placeholder bullets with your content
 
-Any new `src/*.tex` file is automatically picked up as a Make dependency — saving the file triggers a rebuild.
+Any `src/*.tex` file is automatically tracked as a Make dependency, but only files explicitly included from `main.tex` are rendered.
+
+## Optional Example Slides
+
+Two generic examples are included but not rendered by default:
+
+```latex
+\input{src/slide_two_column_example.tex}
+\input{src/slide_code_example.tex}
+```
+
+Use these as copyable patterns for two-column slides and code-heavy slides. Frames containing `lstlisting` or `\lstinputlisting` must use the Beamer `fragile` option:
+
+```latex
+\begin{frame}[plain,fragile]
+```
+
+## Shared Macros and Styles
+
+### `\slideheader{Title}`
+
+Draws the content-slide header: stacked color bars, slide title, and small Argonne/ATLAS logos.
+
+### `\slideheaderfooter`
+
+Draws the date in the bottom-left and frame counter in the bottom-right. It should appear near the end of every frame.
+
+### `\tightlist`
+
+Reduces list spacing. Use as the first command inside `itemize` or `enumerate` when a compact slide is needed.
+
+### `\takeaway{...}`
+
+Adds a small blue “Key message” callout for the main point of a slide.
+
+### Listing styles
+
+The template defines these `listings` styles:
+
+- `pythoncode`
+- `yamlcode`
+- `textcode`
+- `bashcode`
+
+Example:
+
+```latex
+\begin{lstlisting}[style=pythoncode]
+def example():
+    return True
+\end{lstlisting}
+```
+
+## Appendix / Backup Slides
+
+If you want backup slides without counting them in the main footer denominator, use this pattern in `main.tex`:
+
+```latex
+\input{src/main_deck.tex}
+\setmainframenumber
+\appendix
+\input{src/backup.tex}
+```
+
+This keeps main-deck slides numbered as `current/main-total` while backup slides continue after the appendix.
 
 ## Slide Anatomy
 
 ### Title Slide (`src/title.tex`)
 
-- Both logos displayed large across the top
-- Two mirrored groups of stacked diagonal colored rectangles (left and right) flank a centered white title box
-- Author and institute rendered below in a centered text block
-- Date (bottom-left) and page counter (bottom-right) drawn by `\slideheaderfooter`
+- large Argonne and ATLAS logos across the top
+- mirrored stacked diagonal color-bar motifs
+- centered white title box
+- smaller italic subtitle block
+- author and institute block
+- shared date/frame footer
 
 ### Content Slide (`src/blank.tex`)
 
-- Stacked diagonal color bars in the header (red, green, blue) with a white title bar on top
-- Small Argonne and ATLAS logos in the top-right corner
-- A `minipage` content area below the header for body text, lists, figures, etc.
-- Date and page counter from `\slideheaderfooter`
-
-### Brand Colors
-
-| Name  | Hex       |
-|-------|-----------|
-| Red   | `#CD202C` |
-| Green | `#77B300` |
-| Blue  | `#0081CA` |
-
-## Previewing Slides as Images
-
-To visually inspect the output, convert the PDF pages to PNG images using `pdftoppm` (part of the `poppler-utils` package):
-
-```bash
-pdftoppm -r 150 tmp/main.pdf tmp/slide -png
-```
-
-This writes one PNG per page into `tmp/`:
-
-```
-tmp/slide-1.png   # page 1 (title slide)
-tmp/slide-2.png   # page 2
-# ...
-```
-
-The `-r 150` flag sets 150 DPI — sufficient for on-screen review. Increase to `-r 300` for higher-fidelity inspection.
-
-Open any page directly:
-
-```bash
-xdg-open tmp/slide-1.png   # Linux desktop
-open tmp/slide-1.png        # macOS
-```
+- reusable header from `\slideheader{...}`
+- content area below the header beginning around 14 mm from the top
+- shared date/frame footer
 
 ## Design Notes
 
-- **Canvas:** 160 mm × 90 mm (Beamer `aspectratio=169`)
-- **Font:** TeX Gyre Heros (metric-compatible Helvetica/Arial substitute)
-- **TikZ coordinates** are taken directly from the ODF XML of `template/Argonne_Template.odp` and converted mathematically to the 160 × 90 mm canvas
-- The `\slideheaderfooter` macro is defined once in `main.tex` and called at the end of every frame for consistent date and page numbering
+- **Canvas:** 160 mm × 90 mm via Beamer `aspectratio=169`
+- **Font:** TeX Gyre Heros, a Helvetica/Arial-compatible sans-serif
+- **Coordinates:** TikZ overlay coordinates use `(current page.north west)` with millimeter units
+- **Brand colors:** red `#CD202C`, green `#77B300`, blue `#0081CA`

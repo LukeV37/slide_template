@@ -4,8 +4,8 @@
 %  Font: TeX Gyre Heros (Helvetica/Arial substitute)
 %
 %  Usage:
-%    latexmk -pdf main.tex
-%    (or: pdflatex main.tex && pdflatex main.tex)
+%    make
+%    latexmk -pdf -outdir=tmp main.tex
 %
 %  To add a new content slide:
 %    1. Duplicate src/blank.tex -> src/slideNN.tex
@@ -16,21 +16,113 @@
 
 % ---------- packages ----------
 \usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
 \usepackage{graphicx}
 \usepackage[T1]{fontenc}
 \usepackage{tgheros}          % TeX Gyre Heros = metric-compatible Helvetica/Arial
 \renewcommand{\familydefault}{\sfdefault}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{amsmath}
 
 % ---------- strip all default Beamer chrome ----------
 \setbeamertemplate{navigation symbols}{}
 \setbeamertemplate{headline}{}
 \setbeamertemplate{footline}{}
 \setbeamertemplate{frametitle}{}
+\setbeamertemplate{itemize item}{\color{black}\small\textendash}
+\setbeamertemplate{itemize subitem}{\color{black}\scriptsize\textendash}
+\setbeamertemplate{itemize subsubitem}{\color{black}\tiny\textendash}
+\setbeamerfont{itemize/enumerate body}{size=\small}
+\setbeamerfont{itemize/enumerate subbody}{size=\small}
 
-% ---------- exact colors from ODF XML ----------
+% ---------- brand colors ----------
 \definecolor{argonneRed}{HTML}{CD202C}
 \definecolor{argonneGreen}{HTML}{77B300}
 \definecolor{argonneBlue}{HTML}{0081CA}
+\hypersetup{colorlinks=true, urlcolor=argonneBlue}
+
+% ---------- code/listing styles ----------
+% Frames containing lstlisting/lstinputlisting should use [fragile].
+\lstdefinestyle{pythoncode}{
+  language=Python,
+  basicstyle=\ttfamily\fontsize{6.0}{6.8}\selectfont,
+  keywordstyle=\color{argonneBlue}\bfseries,
+  commentstyle=\color{gray},
+  stringstyle=\color{argonneRed},
+  numbers=left,
+  numberstyle=\fontsize{5.0}{5.6}\selectfont\color{gray},
+  stepnumber=1,
+  numbersep=4pt,
+  showstringspaces=false,
+  breaklines=true,
+  breakatwhitespace=true,
+  columns=fullflexible,
+  keepspaces=true,
+  frame=single,
+  framerule=0.3pt,
+  rulecolor=\color{black!25},
+  xleftmargin=1.2em,
+  framexleftmargin=0.8em,
+  aboveskip=3pt,
+  belowskip=0pt,
+  tabsize=4
+}
+\lstdefinestyle{yamlcode}{
+  basicstyle=\ttfamily\fontsize{6.0}{6.8}\selectfont,
+  numbers=left,
+  numberstyle=\fontsize{5.0}{5.6}\selectfont\color{gray},
+  stepnumber=1,
+  numbersep=4pt,
+  showstringspaces=false,
+  breaklines=true,
+  breakatwhitespace=true,
+  columns=fullflexible,
+  keepspaces=true,
+  frame=single,
+  framerule=0.3pt,
+  rulecolor=\color{black!25},
+  xleftmargin=1.2em,
+  framexleftmargin=0.8em,
+  aboveskip=3pt,
+  belowskip=0pt,
+  tabsize=2
+}
+\lstdefinestyle{textcode}{
+  basicstyle=\ttfamily\fontsize{6.0}{6.8}\selectfont,
+  numbers=none,
+  showstringspaces=false,
+  breaklines=true,
+  breakatwhitespace=true,
+  columns=fullflexible,
+  keepspaces=true,
+  frame=single,
+  framerule=0.3pt,
+  rulecolor=\color{black!25},
+  xleftmargin=0.8em,
+  framexleftmargin=0.5em,
+  aboveskip=3pt,
+  belowskip=0pt,
+  tabsize=2
+}
+\lstdefinestyle{bashcode}{
+  basicstyle=\ttfamily\fontsize{5.7}{6.5}\selectfont,
+  numbers=none,
+  showstringspaces=false,
+  breaklines=true,
+  breakatwhitespace=true,
+  columns=fullflexible,
+  keepspaces=true,
+  frame=single,
+  framerule=0.3pt,
+  rulecolor=\color{black!25},
+  xleftmargin=0.8em,
+  framexleftmargin=0.5em,
+  aboveskip=3pt,
+  belowskip=0pt,
+  tabsize=2
+}
+\lstset{style=pythoncode}
 
 % ---------- logo paths ----------
 \newcommand{\argonneLogo}{logos/Argonne-Logo.png}
@@ -39,27 +131,56 @@
 % ---------- slide metadata (edit these) ----------
 \title{Title}
 \subtitle{Subtitle}
-\author{Luke Vaughan}
+\author{Author Name}
 \institute{Argonne National Laboratory}
 \date{\today}
 
+% ---------- shared small helpers ----------
+\newcommand{\takeaway}[1]{%
+  \vspace{1.4mm}%
+  {\small\color{argonneBlue}\textbf{Key message:} #1}\par%
+}
+\newcommand{\tightlist}{\setlength{\itemsep}{1.2mm}\setlength{\parskip}{0pt}}
+
 % ============================================================
-%  Shared macro: logos + footer (date bottom-left, page counter
-%  bottom-right).  Placed on every slide via TikZ overlay.
+%  Shared macro: logos + footer.
 %
-%  Coordinates use beamer's 160mm x 90mm canvas.
-%  (current page.north west) + (x mm, -y mm)  =>  y grows downward.
+%  If using appendix/backup slides, call \setmainframenumber just
+%  before \appendix so the footer denominator counts only the main deck.
 % ============================================================
+\makeatletter
+\newcommand{\setmainframenumber}{%
+  \protected@write\@auxout{}{\string\gdef\string\mainframenumber{\insertframenumber}}%
+}
+\makeatother
+\providecommand{\mainframenumber}{\inserttotalframenumber}
+\newcommand{\totalframesdisplay}{\mainframenumber}
 \newcommand{\slideheaderfooter}{%
   \begin{tikzpicture}[remember picture, overlay, shift={(current page.north west)}]
-    % ---- date (bottom-left, x=4mm inset from left edge) ----
     \node[anchor=west, inner sep=0pt, font=\fontsize{8}{9}\selectfont]
       at (4mm, -87.4mm)
       {\insertdate};
-    % ---- page counter (bottom-right, x=156mm inset from right edge) ----
     \node[anchor=east, inner sep=0pt, font=\fontsize{8}{9}\selectfont]
       at (156mm, -87.4mm)
-      {\insertframenumber\,/\,\inserttotalframenumber};
+      {\insertframenumber\,/\,\totalframesdisplay};
+  \end{tikzpicture}%
+}
+
+% ============================================================
+%  Shared macro: content-slide header.
+% ============================================================
+\newcommand{\slideheader}[1]{%
+  \begin{tikzpicture}[remember picture, overlay, shift={(current page.north west)}]
+    \fill[argonneRed]   (0.73mm, -0.77mm) rectangle ++(58.08mm, -5.81mm);
+    \fill[argonneGreen] (2.18mm, -2.18mm) rectangle ++(72.59mm, -5.81mm);
+    \fill[argonneBlue]  (3.63mm, -3.63mm) rectangle ++(87.11mm, -5.81mm);
+    \fill[white]        (5.08mm, -5.08mm) rectangle ++(101.27mm, -7.30mm);
+    \node[anchor=west, font=\fontsize{14}{16}\selectfont\bfseries, text width=96mm]
+      at (7mm, -5.08mm - 7.30mm/2) {#1};
+    \node[anchor=north west, inner sep=0pt] at (100mm, -3mm)
+      {\includegraphics[width=25mm]{\argonneLogo}};
+    \node[anchor=north west, inner sep=0pt] at (130mm, 1mm)
+      {\includegraphics[width=25mm]{\atlasLogo}};
   \end{tikzpicture}%
 }
 
@@ -68,5 +189,10 @@
 
 \input{src/title.tex}
 \input{src/blank.tex}
+
+% Optional backup section pattern:
+% \setmainframenumber
+% \appendix
+% \input{src/backup.tex}
 
 \end{document}

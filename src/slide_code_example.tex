@@ -1,0 +1,19 @@
+% Optional example slide; uncomment the input line in main.tex to include it.
+% Frames with listings need the fragile option.
+\begin{frame}[plain,fragile]
+  \slideheader{Code Example}
+
+  \vspace{14mm}
+  {\small Keep code excerpts short and focused on the point of the slide.}\par
+  \vspace{1mm}
+
+\begin{lstlisting}[style=pythoncode]
+def transform(inputs):
+    """Minimal example for code-heavy slides."""
+    outputs = model(inputs)
+    return outputs
+\end{lstlisting}
+
+  \takeaway{Show only the lines needed to support the claim.}
+  \slideheaderfooter
+\end{frame}
