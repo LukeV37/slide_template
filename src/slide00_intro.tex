@@ -1,0 +1,20 @@
+\begin{frame}[plain]
+  \slideheader{Introduction}
+
+  \vspace{16mm}
+  {\small \textbf{Preprocessing-Core provides a public, reusable foundation for dataset preprocessing.}}\par
+
+  \vspace{4mm}
+  \begin{itemize}
+    \item Generic pipeline logic lives in the public core
+    \item Private data logic stays in private repositories
+    \item Private repos can include the core as a submodule or package
+    \item YAML selects registered loaders, splits, and transforms
+    \item Custom loaders and \texttt{register()} functions let each project extend the core safely
+  \end{itemize}
+
+  \vspace{3mm}
+  {\small Shared preprocessing infrastructure without exposing private dataset-specific code.}
+
+  \slideheaderfooter
+\end{frame}

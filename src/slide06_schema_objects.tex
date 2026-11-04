@@ -1,25 +1,19 @@
 \begin{frame}[plain,fragile]
-  \slideheader{Compact typed schema objects}
+  \slideheader{Custom Registry Overview}
 
   \vspace{14mm}
   \begin{columns}[T,onlytextwidth]
-    \begin{column}{0.45\textwidth}
-      {\small A small set of dataclasses is enough to describe the whole pipeline.}\par
+    \begin{column}{0.42\textwidth}
+      {\small Public registries let private repositories plug in project-specific code.}\par
       \vspace{1.5mm}
       \begin{itemize}
-        \item \texttt{LoaderConfig} names the loader and its params
-        \item \texttt{SplitConfig} names the split policy and params
-        \item \texttt{PipelineConfig} ties the sections together
+        \item Register loaders, transforms, and split policies
+        \item YAML refers to them by short names
+        \item Same seam works for built-ins and private extensions
       \end{itemize}
     \end{column}
-    \begin{column}{0.53\textwidth}
-      {\scriptsize Core config objects:}\par
-      \vspace{1mm}
-      \lstinputlisting[firstline=20,lastline=31,numbers=none]{\corepath/src/preprocessing_core/config.py}
-      \vspace{1mm}
-      \lstinputlisting[firstline=63,lastline=74,numbers=none]{\corepath/src/preprocessing_core/config.py}
-      \vspace{1mm}
-      \lstinputlisting[firstline=77,lastline=88,numbers=none]{\corepath/src/preprocessing_core/config.py}
+    \begin{column}{0.54\textwidth}
+      \lstinputlisting[numbers=none,firstline=20,lastline=31]{\corepath/src/preprocessing_core/registry.py}
     \end{column}
   \end{columns}
 

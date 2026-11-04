@@ -1,0 +1,21 @@
+\begin{frame}[plain,fragile]
+  \slideheader{PipelineConfig Overview}
+
+  \vspace{14mm}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.43\textwidth}
+      {\small YAML is parsed into one validated typed object for the pipeline.}\par
+      \vspace{1.5mm}
+      \begin{itemize}
+        \item Groups loader, split, and transform settings
+        \item Carries metadata alongside execution settings
+        \item Validates the config before runtime
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.53\textwidth}
+      \lstinputlisting[numbers=none,firstline=77,lastline=85]{\corepath/src/preprocessing_core/config.py}
+    \end{column}
+  \end{columns}
+
+  \slideheaderfooter
+\end{frame}

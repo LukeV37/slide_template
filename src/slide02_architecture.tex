@@ -1,5 +1,5 @@
 \begin{frame}[plain]
-  \slideheader{Main framework architecture}
+  \slideheader{Framework Architecture}
 
   \vspace{11mm}
   \centering
@@ -29,8 +29,9 @@
     \draw[arrow] (dataset) -- (bundle);
     \draw[arrow] (registry.south -| pipe.north) -- (pipe.north);
 
-    \node[align=left, text width=135mm, anchor=north west] at (0,-50)
-      {\small \textbf{Takeaway:} orchestrator, shared dataset contract, structured output, and an explicit registry seam.};
+    \node[align=center, text width=120mm, anchor=north] at (78,-50)
+      {{\small \textbf{Takeaway:} config-driven orchestration with a shared dataset contract\\
+and registry-based extension.}};
   \end{tikzpicture}
 
   \slideheaderfooter

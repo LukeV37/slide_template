@@ -1,0 +1,37 @@
+\begin{frame}[plain]
+  \slideheader{Example Dataset: Mock Calibrator}
+
+  \vspace{14mm}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.46\textwidth}
+      {\small A concrete example shows how project-specific data plugs into the public preprocessing core.}\par
+      \vspace{2mm}
+      \begin{itemize}
+        \item Synthetic multichannel time-series dataset used for demos and tests
+        \item 10{,}000 timesteps, 8 channels, 4 features per sample
+        \item Features include clean signal, noise, noisy signal, and SNR
+        \item Injected low-SNR anomaly periods create outliers for repair and scaling
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      {\small The example keeps the core generic:}\par
+      \vspace{1.5mm}
+      \begin{itemize}
+        \item custom loader registered as \texttt{mock\_calibrator\_npz}
+        \item standard YAML pipeline drives the run
+        \item output is the same core \texttt{DatasetBundle} contract
+      \end{itemize}
+
+      \vspace{3mm}
+      {\small Generator settings used here:}\par
+      \vspace{1mm}
+      \begin{itemize}
+        \item \texttt{dt = 0.01}, seed \texttt{123}
+        \item plotted channels: \texttt{[0, 1, 2]}
+        \item plotted range: first \texttt{1000} timesteps
+      \end{itemize}
+    \end{column}
+  \end{columns}
+
+  \slideheaderfooter
+\end{frame}

@@ -1,0 +1,23 @@
+\begin{frame}[plain,fragile]
+  \slideheader{Mock Calibrator: Input YAML}
+
+  \vspace{14mm}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.36\textwidth}
+      {\small The example pipeline is still just declarative configuration.}\par
+      \vspace{1.5mm}
+      \begin{itemize}
+        \item selects the custom loader
+        \item fills NaNs before splitting
+        \item splits chronologically
+        \item repairs rolling outliers on train and validation
+        \item fits scaling on train and applies it to all splits
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.61\textwidth}
+      \lstinputlisting[style=yamlcode,numbers=none,firstline=3,lastline=30]{\corepath/examples/mock_calibrator/pipeline.yaml}
+    \end{column}
+  \end{columns}
+
+  \slideheaderfooter
+\end{frame}

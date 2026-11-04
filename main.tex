@@ -107,6 +107,13 @@
 %  Coordinates use beamer's 160mm x 90mm canvas.
 %  (current page.north west) + (x mm, -y mm)  =>  y grows downward.
 % ============================================================
+\makeatletter
+\newcommand{\setmainframenumber}{%
+  \protected@write\@auxout{}{\string\gdef\string\mainframenumber{\insertframenumber}}%
+}
+\makeatother
+\providecommand{\mainframenumber}{\inserttotalframenumber}
+\newcommand{\totalframesdisplay}{\mainframenumber}
 \newcommand{\slideheaderfooter}{%
   \begin{tikzpicture}[remember picture, overlay, shift={(current page.north west)}]
     % ---- date (bottom-left, x=4mm inset from left edge) ----
@@ -116,7 +123,7 @@
     % ---- page counter (bottom-right, x=156mm inset from right edge) ----
     \node[anchor=east, inner sep=0pt, font=\fontsize{8}{9}\selectfont]
       at (156mm, -87.4mm)
-      {\insertframenumber\,/\,\inserttotalframenumber};
+      {\insertframenumber\,/\,\totalframesdisplay};
   \end{tikzpicture}%
 }
 
@@ -152,14 +159,19 @@
 \begin{document}
 
 \input{src/title.tex}
-\input{src/slide01_overview.tex}
+\input{src/slide00_intro.tex}
 \input{src/slide02_architecture.tex}
 \input{src/slide03_yaml.tex}
-\input{src/slide04_pipeline_runtime.tex}
-\input{src/slide05_schema.tex}
+\input{src/slide04_pipeline_config.tex}
+\input{src/slide05_preprocessing_pipeline.tex}
 \input{src/slide06_schema_objects.tex}
 \input{src/slide07_contracts.tex}
 \input{src/slide08_bundle.tex}
-\input{src/slide09_extensions.tex}
+\input{src/slide09_mock_intro.tex}
+\input{src/slide10_mock_plot.tex}
+\input{src/slide11_mock_yaml.tex}
+\input{src/slide12_mock_log.tex}
+\input{src/slide10_conclusion.tex}
+\input{src/slide13_backup_cloc.tex}
 
 \end{document}
