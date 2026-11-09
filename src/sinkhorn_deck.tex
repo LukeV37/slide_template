@@ -1,535 +1,144 @@
-\begin{frame}[plain,fragile]
-  \slideheader{Motivation}
+\begin{frame}[plain]
+  \slideheader{Why Domain Alignment?}
 
-  \vspace{15mm}
-  {\small\textbf{Problem: classifier performance can degrade under domain shift.}}\par
+  \vspace{16mm}
+  {\small\textbf{Goal: reduce MC--data scale-factor uncertainty during calibration.}}\par
 
-  \vspace{2mm}
+  \vspace{4mm}
   \begin{itemize}\tightlist
-    \item GN3/SALT is trained for jet-flavour classification.
-    \item Inputs may come from multiple domains: nominal simulation/reconstruction, alternate samples, systematic variations, or shifted distributions.
-    \item A model trained only to classify nominal data can learn representations that are not stable across domains.
-    \item Goal: preserve flavour discrimination while making the learned embedding less sensitive to nominal--alternate differences.
+    \item We expect some raw MC tagging performance to drop: the tagger should not profit from MC mis-modeling.
+    \item The target is a representation that extracts maximal flavor information while being less sensitive to MC/data domain effects.
+    \item Desired tradeoff: lower raw MC performance but smaller SF uncertainty; both effects compound but could help downstream analyses in the long run (to be determined).
   \end{itemize}
 
-  \takeaway{Robust tagging needs representations that remain discriminative for flavour but less domain-specific.}
-
-  \slideheaderfooter
-\end{frame}
-
-\begin{frame}[plain,fragile]
-  \slideheader{Design Goal}
-
-  \vspace{15mm}
-  {\small\textbf{Minimum viable domain-alignment implementation.}}\par
-
-  \vspace{2mm}
-  \begin{columns}[T,totalwidth=\textwidth]
-    \begin{column}{0.50\textwidth}
-      \begin{itemize}\tightlist
-        \item Use one shared GN3/SALT backbone.
-        \item Keep the standard jet-classification head.
-        \item Add Sinkhorn alignment on \texttt{global\_rep}.
-        \item Treat alternate-domain samples as unlabeled for optimization.
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.46\textwidth}
-      \begin{itemize}\tightlist
-        \item No MACK/ROCK integration yet.
-        \item No adversarial/SAT-style training yet.
-        \item No auxiliary GN2/GN3 tasks in the MVP.
-        \item No dynamic GLS/DWA loss weighting for the first study.
-      \end{itemize}
-    \end{column}
-  \end{columns}
-
-  \takeaway{This is a small, controlled SALT extension rather than a full architecture redesign.}
-
-  \slideheaderfooter
-\end{frame}
-
-\begin{frame}[plain,fragile]
-  \slideheader{Dataset Setup}
-
-  \vspace{14mm}
-  \begin{columns}[T,totalwidth=\textwidth]
-    \begin{column}{0.45\textwidth}
-      {\small\textbf{Existing mixed-domain H5 layout}}\par
-      \begin{lstlisting}[style=textcode]
-jets.source_label = 0 or 1
-jets.flavour_label = class label
-      \end{lstlisting}
-      \vspace{1mm}
-      \begin{lstlisting}[style=yamlcode]
-classification_nominal_value: 0
-nominal_value: 0
-alternate_value: 1
-      \end{lstlisting}
-    \end{column}
-    \begin{column}{0.51\textwidth}
-      \begin{itemize}\tightlist
-        \item \texttt{source\_label} identifies nominal vs alternate domain.
-        \item \texttt{flavour\_label} is used only for nominal supervised classification.
-        \item Alternate labels may exist in H5, but are ignored during optimization.
-        \item \texttt{source\_label} is kept out of \texttt{data.variables} to avoid direct domain leakage.
-      \end{itemize}
-      \vspace{2mm}
-      {\scriptsize\color{argonneRed}\textbf{Open check:} confirm semantic mapping of \texttt{source\_label == 0} vs \texttt{1} before production training.}
-    \end{column}
-  \end{columns}
-
-  \takeaway{Domain labels are metadata for masking/splitting losses, not model inputs.}
-
-  \slideheaderfooter
-\end{frame}
-
-\begin{frame}[plain,fragile]
-  \slideheader{Training Objective}
-
-  \vspace{15mm}
+  \vspace{5mm}
   \begin{center}
-    {\large\textbf{$L_{\mathrm{total}} = L_{\mathrm{CE, nominal}} + \lambda_{\mathrm{Sinkhorn}}(t)\,D_{\mathrm{Sinkhorn}}(z_{\mathrm{nominal}}, z_{\mathrm{alternate}})$}}
+    {\large\color{argonneBlue}\textbf{Train for flavor discrimination, not simulation artifacts.}}
   \end{center}
 
-  \vspace{2mm}
-  \begin{itemize}\tightlist
-    \item \textbf{Nominal classification loss}: standard jet-classification CE, evaluated only on nominal rows.
-    \item \textbf{Sinkhorn alignment loss}: compares nominal and alternate \texttt{global\_rep} embedding distributions.
-    \item \textbf{Alignment strength}: configured by the Sinkhorn loss \texttt{weight}, with optional warmup/ramp scaling.
-    \item \textbf{Diagnostics}: raw Sinkhorn and ramp scale are logged separately and excluded from the optimized total loss.
-  \end{itemize}
-
-  \takeaway{Trusted nominal labels drive classification; both domains shape a more stable representation.}
-
   \slideheaderfooter
 \end{frame}
 
-\begin{frame}[plain,fragile]
-  \slideheader{Why Sinkhorn?}
+\begin{frame}[plain]
+  \slideheader{Minimal Domain-Alignment Baseline}
 
-  \vspace{15mm}
-  {\small\textbf{Optimal transport gives a distribution-level alignment objective.}}\par
-
-  \vspace{2mm}
-  \begin{columns}[T,totalwidth=\textwidth]
-    \begin{column}{0.52\textwidth}
-      \begin{itemize}\tightlist
-        \item Compares embedding point clouds directly.
-        \item Does not require alternate-domain labels.
-        \item Provides a smooth, differentiable objective.
-        \item Works as a headless auxiliary loss on \texttt{global\_rep}.
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \begin{itemize}\tightlist
-        \item No domain discriminator.
-        \item No adversarial min--max loop.
-        \item No second output head.
-        \item Directly fits into the existing SALT training step.
-      \end{itemize}
-    \end{column}
-  \end{columns}
-
-  \takeaway{Sinkhorn alignment encourages domain-stable embeddings without adversarial machinery.}
-
-  \slideheaderfooter
-\end{frame}
-
-\begin{frame}[plain,fragile]
-  \slideheader{Implementation Overview}
-
-  \vspace{14mm}
-  \begin{columns}[T,totalwidth=\textwidth]
-    \begin{column}{0.47\textwidth}
-      {\small\textbf{Main additions inside \texttt{ModelWrapper}}}\par
-      \begin{itemize}\tightlist
-        \item Optional \texttt{domain\_alignment} module.
-        \item Domain-label config for CE masking and embedding split.
-        \item Optional nominal-only classification loss.
-        \item Epoch-based warmup/ramp controls.
-        \item Diagnostic logging for raw Sinkhorn and scale.
-        \item Guard: initial Sinkhorn work uses \texttt{loss\_mode: wsum}.
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.49\textwidth}
-      \begin{lstlisting}[style=textcode]
-salt/modelwrapper.py
-salt/models/SinkhornDomainAlignmentLoss.py
-      \end{lstlisting}
-      \vspace{1mm}
-      \begin{lstlisting}[style=yamlcode]
-domain_label: source_label
-nominal_value: 0
-alternate_value: 1
-mask_alternate_classification_loss: true
-      \end{lstlisting}
-    \end{column}
-  \end{columns}
-
-  \takeaway{The Sinkhorn loss is integrated as an optional extension to the wrapper.}
-
-  \slideheaderfooter
-\end{frame}
-
-\begin{frame}[plain,fragile]
-  \slideheader{Model/Data Flow}
-
-  \vspace{10mm}
-  \centering
-  \begin{tikzpicture}[x=1mm,y=1mm,
-      box/.style={draw=argonneBlue, thick, rounded corners=1.5mm, fill=argonneBlue!6,
-                  align=center, inner sep=1.4mm, minimum height=8mm},
-      lossbox/.style={draw=argonneGreen!70!black, thick, rounded corners=1.5mm,
-                      fill=argonneGreen!10, align=center, inner sep=1.4mm, minimum height=8mm},
-      note/.style={align=center, font=\scriptsize},
-      arrow/.style={-Latex, thick, argonneRed}]
-
-    \node[box, minimum width=34mm] (batch) at (78,-2) {\textbf{Mixed H5 batch}\\[-0.3mm]\scriptsize \texttt{source\_label} + features};
-    \node[box, minimum width=44mm] (backbone) at (78,-18) {\textbf{GN3/SALT backbone}\\[-0.3mm]\scriptsize features exclude \texttt{source\_label}};
-    \node[box, minimum width=34mm] (rep) at (34,-34) {\textbf{global\_rep}\\[-0.3mm]\scriptsize shared embedding};
-    \node[box, minimum width=40mm] (head) at (112,-34) {\textbf{classification head}\\[-0.3mm]\scriptsize jet flavour logits};
-    \node[lossbox, minimum width=42mm] (sinkhorn) at (34,-50) {\textbf{Sinkhorn alignment}\\[-0.3mm]\scriptsize nominal vs alternate};
-    \node[lossbox, minimum width=45mm] (ce) at (112,-50) {\textbf{CE loss}\\[-0.3mm]\scriptsize nominal rows only};
-
-    \draw[arrow] (batch) -- (backbone);
-    \draw[arrow] (backbone) -- (rep);
-    \draw[arrow] (backbone) -- (head);
-    \draw[arrow] (rep) -- (sinkhorn);
-    \draw[arrow] (head) -- (ce);
-    \node[note, text width=78mm, anchor=north] at (78,-58) {\texttt{source\_label} is used only after the forward pass for splitting embeddings and masking CE.};
-  \end{tikzpicture}
-
-  \slideheaderfooter
-\end{frame}
-
-\begin{frame}[plain,fragile]
-  \slideheader{Warmup and Ramp}
-
-  \vspace{11mm}
-  \begin{columns}[T,totalwidth=\textwidth]
-    \begin{column}{0.42\textwidth}
-      {\small\textbf{Preserve a classification-only baseline.}}\par
-      \begin{lstlisting}[style=yamlcode]
-alignment_warmup_epochs: 100
-alignment_ramp_epochs: 20
-      \end{lstlisting}
-    \end{column}
+  \vspace{9mm}
+  \begin{columns}[c,totalwidth=\textwidth]
     \begin{column}{0.54\textwidth}
+      {\small\textbf{MACK/ROCK-style implementation in SALT}}\par
+      \vspace{0.5mm}
+      {\scriptsize
       \begin{itemize}\tightlist
-        \item Epochs \texttt{0--99}: classification-only.
-        \item Epoch \texttt{099}: warmup-end baseline checkpoint.
-        \item Epoch \texttt{100+}: Sinkhorn alignment begins.
-        \item Ramp gradually increases the alignment contribution.
-      \end{itemize}
+        \item shared GN3/SALT transformer backbone for nominal and alternate samples
+        \item nominal flavor labels train the classification head
+        \item \texttt{source\_label} domain labels split samples for Sinkhorn OT
+        \item each jet is represented by \texttt{global\_rep} for both classification and alignment
+        \item Sinkhorn approximates EMD between nominal and alternate latent distributions
+      \end{itemize}}
     \end{column}
-  \end{columns}
-
-  \vspace{2mm}
-  \begin{center}
-    \begin{tikzpicture}[x=1mm,y=1mm]
-      \draw[->, thick] (0,0) -- (98,0) node[anchor=west]{\scriptsize epoch};
-      \draw[->, thick] (0,0) -- (0,18) node[anchor=south]{\scriptsize scale};
-      \draw[argonneBlue, very thick] (0,0) -- (50,0) -- (68,14) -- (94,14);
-      \draw[dashed] (50,0) -- (50,16);
-      \draw[dashed] (68,0) -- (68,16);
-      \node[anchor=north] at (50,-1) {\scriptsize 100};
-      \node[anchor=north] at (68,-1) {\scriptsize 120};
-      \node[anchor=south] at (25,3) {\scriptsize warmup};
-      \node[anchor=south] at (59,7) {\scriptsize ramp};
-      \node[anchor=south] at (82,14) {\scriptsize full weight};
-    \end{tikzpicture}
-  \end{center}
-
-  \takeaway{One training run can provide both baseline and domain-aligned checkpoints.}
-
-  \slideheaderfooter
-\end{frame}
-
-\begin{frame}[plain,fragile]
-  \slideheader{Configuration}
-
-  \vspace{12mm}
-  {\small\textbf{Main config:} \texttt{salt/configs/GN3/GN3\_sinkhorn\_domain\_alignment.yaml}}\par
-
-  \begin{lstlisting}[style=yamlcode]
-model:
-  loss_mode: wsum
-  mask_alternate_classification_loss: true
-  classification_domain_label: source_label
-  classification_nominal_value: 0
-  alignment_warmup_epochs: 100
-  alignment_ramp_epochs: 20
-  domain_alignment:
-    class_path: salt.models.SinkhornDomainAlignmentLoss
-    init_args:
-      input_name: jets
-      domain_label: source_label
-      nominal_value: 0
-      alternate_value: 1
-      weight: 0.1
-      blur: 0.1
-      scaling: 0.8
-      normalization: layernorm
-      min_samples_per_domain: 8
-  \end{lstlisting}
-
-  \takeaway{One config can run warmup, active Sinkhorn training, and checkpoint-based comparison.}
-
-  \slideheaderfooter
-\end{frame}
-
-\begin{frame}[plain,fragile]
-  \slideheader{Batch Composition Checks}
-
-  \vspace{14mm}
-  {\small\textbf{Sinkhorn requires both domains in each batch.}}\par
-
-  \vspace{1mm}
-  \begin{columns}[T,totalwidth=\textwidth]
-    \begin{column}{0.52\textwidth}
-      \begin{lstlisting}[style=bashcode]
-python salt/utils/check_domain_batches.py \
-  --file /path/to/pp_output_train.h5 \
-  --dataset jets \
-  --domain-label source_label \
-  --batch-size 256 \
-  --min-samples-per-domain 8 \
-  --ignore-tail
-      \end{lstlisting}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \begin{itemize}\tightlist
-        \item Scans contiguous H5 windows matching SALT batch size.
-        \item Reports min/max nominal and alternate counts.
-        \item Flags single-domain batches.
-        \item Flags unexpected domain-label values.
-      \end{itemize}
-    \end{column}
-  \end{columns}
-
-  \vspace{2mm}
-  {\small\textbf{Current validation summary:} train and validation batches contain both domains; no single-domain batches or unexpected labels found.}\par
-
-  \takeaway{The existing mixed H5 layout is compatible with per-batch Sinkhorn alignment.}
-
-  \slideheaderfooter
-\end{frame}
-
-\begin{frame}[plain,fragile]
-  \slideheader{Environment and Dependencies}
-
-  \vspace{14mm}
-  \begin{columns}[T,totalwidth=\textwidth]
-    \begin{column}{0.45\textwidth}
-      {\small\textbf{Lightweight repo-local environment}}\par
-      \begin{lstlisting}[style=bashcode]
-uv venv .venv-salt
-source .venv-salt/bin/activate
-uv sync
-      \end{lstlisting}
-      \vspace{1mm}
-      \begin{lstlisting}[style=textcode]
-geomloss>=0.2.6
-      \end{lstlisting}
-    \end{column}
-    \begin{column}{0.51\textwidth}
-      {\small\textbf{Smoke validation completed}}\par
-      \begin{itemize}\tightlist
-        \item PyTorch CUDA available.
-        \item \texttt{geomloss} imports successfully.
-        \item \texttt{salt --help} works.
-        \item Short GPU training smoke test completes.
-      \end{itemize}
-    \end{column}
-  \end{columns}
-
-  \takeaway{The implementation adds one main dependency and works in a lightweight local environment.}
-
-  \slideheaderfooter
-\end{frame}
-
-\begin{frame}[plain,fragile]
-  \slideheader{Smoke Test Results}
-
-  \vspace{14mm}
-  {\small\textbf{Initial GPU smoke test passed.}}\par
-
-  \vspace{1mm}
-  \begin{columns}[T,totalwidth=\textwidth]
-    \begin{column}{0.45\textwidth}
-      \begin{itemize}\tightlist
-        \item Config loads successfully.
-        \item Data module initializes.
-        \item Model includes \texttt{SinkhornDomainAlignmentLoss}.
-        \item Training runs on GPU.
-        \item Short 1-epoch smoke completed.
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.51\textwidth}
-      {\small\textbf{Caveat and next smoke}}\par
-      \begin{itemize}\tightlist
-        \item Default warmup means a 1-epoch run mostly tests the classification path.
-        \item FlashAttention missing warning appears, but SALT falls back to \texttt{torch-math}.
-      \end{itemize}
-      \begin{lstlisting}[style=bashcode]
-salt fit -c salt/configs/GN3/GN3_sinkhorn_domain_alignment.yaml \
-  --model.alignment_warmup_epochs 0 \
-  --model.alignment_ramp_epochs 1
-      \end{lstlisting}
-    \end{column}
-  \end{columns}
-
-  \takeaway{The plumbing works; active-Sinkhorn smoke and full training are the next validation steps.}
-
-  \slideheaderfooter
-\end{frame}
-
-\begin{frame}[plain,fragile]
-  \slideheader{Checkpointing and Inference}
-
-  \vspace{14mm}
-  {\small\textbf{Per-epoch checkpoints are available.}}\par
-
-  \vspace{1mm}
-  \begin{columns}[T,totalwidth=\textwidth]
-    \begin{column}{0.44\textwidth}
-      \begin{itemize}\tightlist
-        \item SALT checkpoint callback uses \texttt{save\_top\_k = -1}.
-        \item Checkpoints are kept under the run directory.
-        \item Warmup-end checkpoint is the classification-only baseline.
-        \item Later checkpoints include active alignment.
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.52\textwidth}
-      \begin{lstlisting}[style=textcode]
-logs/<run_name>_<timestamp>/ckpts/
-      \end{lstlisting}
-      \begin{lstlisting}[style=bashcode]
-salt test \
-  -c logs/<run>/config.yaml \
-  --ckpt_path logs/<run>/ckpts/epoch=099-val_loss=....ckpt
-      \end{lstlisting}
-      {\scriptsize If \texttt{--ckpt\_path} is omitted, SALT selects the lowest-validation-loss checkpoint from \texttt{ckpts/}.}\par
-    \end{column}
-  \end{columns}
-
-  \takeaway{Baseline and aligned models can be compared from checkpoints produced by the same training run.}
-
-  \slideheaderfooter
-\end{frame}
-
-\begin{frame}[plain,fragile]
-  \slideheader{What This Enables}
-
-  \vspace{14mm}
-  \begin{columns}[T,totalwidth=\textwidth]
     \begin{column}{0.43\textwidth}
-      {\small\textbf{Direct comparison}}\par
-      \begin{enumerate}\tightlist
-        \item Warmup-end checkpoint: classification-only baseline.
-        \item Later checkpoints: same architecture and data, plus representation alignment.
-      \end{enumerate}
+      \begin{center}
+        \includegraphics[height=32mm,keepaspectratio]{figures/mack-v2.jpg}
+      \end{center}
     \end{column}
-    \begin{column}{0.53\textwidth}
-      {\small\textbf{Evaluation questions}}\par
+  \end{columns}
+
+  \slideheaderfooter
+\end{frame}
+
+\begin{frame}[plain]
+  \slideheader{What is actually optimized?}
+
+  \vspace{15mm}
+  \begin{center}
+    {\large\textbf{$L_{\mathrm{total}} = L_{\mathrm{CE, nominal}} + \lambda\,D_{\mathrm{Sinkhorn}}(z_{\mathrm{nominal}}, z_{\mathrm{alternate}})$}}
+  \end{center}
+
+  \vspace{5mm}
+  \begin{columns}[T,totalwidth=\textwidth]
+    \begin{column}{0.48\textwidth}
+      {\small\textbf{Contributes to classification loss}}\par
       \begin{itemize}\tightlist
-        \item Does nominal classification performance remain stable?
-        \item Does alternate-domain performance improve?
-        \item Do nominal and alternate \texttt{global\_rep} distributions become closer?
-        \item How sensitive are results to Sinkhorn weight?
+        \item nominal samples only
+        \item standard jet-flavor cross-entropy
+        \item alternate labels are ignored for CE
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      {\small\textbf{Contributes to alignment loss}}\par
+      \begin{itemize}\tightlist
+        \item nominal embeddings
+        \item alternate embeddings
+        \item Sinkhorn approximates EMD between the two latent distributions
       \end{itemize}
     \end{column}
   \end{columns}
 
-  \takeaway{The implementation creates a controlled setup for measuring domain-alignment benefit.}
+  \vspace{5mm}
+  \begin{center}
+    {\small\color{argonneBlue}\textbf{The alignment term acts on the representation, not on the classifier logits.}}
+  \end{center}
 
   \slideheaderfooter
 \end{frame}
 
-\begin{frame}[plain,fragile]
-  \slideheader{Planned Hyperparameter Scan}
+\begin{frame}[plain]
+  \slideheader{Implementation: three SALT hooks}
 
-  \vspace{14mm}
-  {\small\textbf{Start with Sinkhorn strength.}}\par
-
-  \vspace{2mm}
-  \begin{columns}[T,totalwidth=\textwidth]
-    \begin{column}{0.42\textwidth}
-      \begin{lstlisting}[style=textcode]
-weight = 0.0, 0.01, 0.05, 0.1
-      \end{lstlisting}
-      \begin{itemize}\tightlist
-        \item \texttt{0.0}: no-alignment control.
-        \item \texttt{0.01}: weak alignment.
-        \item \texttt{0.05}: nominal starting point.
-        \item \texttt{0.1}: stronger alignment.
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.54\textwidth}
-      {\small\textbf{Monitor}}\par
-      \begin{itemize}\tightlist
-        \item nominal validation classification loss;
-        \item alternate-domain test performance;
-        \item flavour-tagging metrics;
-        \item \texttt{sinkhorn\_loss} trends;
-        \item embedding distribution diagnostics.
-      \end{itemize}
-    \end{column}
-  \end{columns}
-
-  \takeaway{Keep the first study simple: scan the primary alignment knob.}
-
-  \slideheaderfooter
-\end{frame}
-
-\begin{frame}[plain,fragile]
-  \slideheader{Current Limitations}
-
-  \vspace{15mm}
-  {\small\textbf{Known caveats before physics interpretation.}}\par
-
-  \vspace{2mm}
-  \begin{itemize}\tightlist
-    \item Semantic mapping of \texttt{source\_label == 0} vs \texttt{source\_label == 1} still needs confirmation.
-    \item Full production training has not yet been run.
-    \item Scientific evaluation is still pending.
-    \item FlashAttention is not installed, so training may be slower or more memory-intensive.
-    \item No MACK/ROCK projector yet.
-    \item No adversarial training or dynamic loss weighting included.
-  \end{itemize}
-
-  \takeaway{The implementation is ready for controlled studies, but physics validation is still required.}
-
-  \slideheaderfooter
-\end{frame}
-
-\begin{frame}[plain,fragile]
-  \slideheader{Summary}
-
-  \vspace{15mm}
-  {\small\textbf{Minimal Sinkhorn domain alignment is now integrated into SALT/GN3.}}\par
-
-  \vspace{2mm}
-  \begin{columns}[T,totalwidth=\textwidth]
+  \vspace{6mm}
+  \begin{columns}[T,totalwidth=0.96\textwidth]
     \begin{column}{0.50\textwidth}
+      \raggedright
+      {\small
       \begin{itemize}\tightlist
-        \item Added optional Sinkhorn alignment on \texttt{global\_rep}.
-        \item Masked classifier loss to nominal-domain rows.
-        \item Kept alternate-domain rows unlabeled for optimization.
-        \item Preserved standard GN3/SALT architecture.
-      \end{itemize}
+        \item \textbf{Config:} sinkhorn loss defined in yaml, set the Sinkhorn weight $\lambda$, and names \texttt{source\_label} as the nominal/alternate domain field.
+        \item \textbf{CE masking:} in \href{https://gitlab.cern.ch/lvaughan/salt/-/commit/1a56805558753deac3f03e123913c9c708f3dfe9}{\texttt{modelwrapper.py}}, every jet runs through the same GN3 backbone; the wrapper masks the supervised flavor CE so only nominal jets train the classifier head.
+        \item \textbf{Alignment loss:} \href{https://gitlab.cern.ch/lvaughan/salt/-/commit/18b40f4233d9161f3e33831bc5cb4c53c322fdeb}{\texttt{SinkhornDomainAlignmentLoss.py}} takes \texttt{preds["global\_rep"]}, splits embeddings by \texttt{source\_label}, and adds a EMD-like distance between the two latent batches.
+      \end{itemize}}
+
     \end{column}
-    \begin{column}{0.46\textwidth}
-      \begin{itemize}\tightlist
-        \item Added one Sinkhorn-capable GN3 config.
-        \item Added batch-composition checking utility.
-        \item Verified basic GPU smoke behavior.
-        \item Established a checkpoint-based baseline/aligned comparison strategy.
-      \end{itemize}
+    \begin{column}{0.43\textwidth}
+      \begin{center}
+        \begin{tikzpicture}[x=1mm,y=1mm,
+          box/.style={draw=argonneBlue, thick, rounded corners=1.4mm, fill=argonneBlue!7, align=center, inner sep=1.7mm},
+          loss/.style={draw=argonneRed, thick, rounded corners=1.4mm, fill=argonneRed!8, align=center, inner sep=1.5mm},
+          note/.style={align=center, font=\scriptsize},
+          arrow/.style={-Latex, thick}]
+          \node[box, minimum width=38mm] (backbone) at (30,18) {shared GN3\\[-0.5mm]\scriptsize transformer backbone};
+          \node[box, minimum width=38mm] (rep) at (30,0) {\texttt{global\_rep}\\[-0.5mm]\scriptsize jet-level latent vector};
+          \node[loss, minimum width=24mm] (ce) at (10,-22) {CE loss\\[-0.5mm]\scriptsize nominal only};
+          \node[loss, minimum width=27mm] (ot) at (50,-22) {Sinkhorn OT\\[-0.5mm]\scriptsize nominal vs alternate};
+          \draw[arrow] (backbone) -- (rep);
+          \draw[arrow] (rep.south west) -- (ce.north);
+          \draw[arrow] (rep.south east) -- (ot.north);
+          \node[note] at (30,-34) {same \texttt{global\_rep} supports\\classification and alignment};
+        \end{tikzpicture}
+      \end{center}
     \end{column}
   \end{columns}
 
-  \takeaway{This is a clean baseline for testing whether optimal-transport alignment improves domain robustness.}
+  \slideheaderfooter
+\end{frame}
+
+\begin{frame}[plain]
+  \slideheader{Discussion points}
+
+  \vspace{13mm}
+  {\small
+  \begin{itemize}\tightlist
+    \item \textbf{Choosing $\lambda$:} pseudo-data gives a verifiable optimum; real data does not.
+    \item \textbf{Batch-level Sinkhorn:} are minibatch domain distances stable enough to replace jet-level EMD?
+    \item \textbf{Sample balance:} do nominal and alternate batches need similar jet flavor mixtures for the alignment to be meaningful?
+    \item \textbf{Calibration endpoint:} train custom GN3, rerun the full chain, and measure changes in $\epsilon_{\mathrm{data}}$ and SF uncertainty.
+  \end{itemize}}
+
+  \vspace{6mm}
+  \begin{center}
+    {\large\color{argonneBlue}\textbf{Main question: does optimal transport reduce SF uncertainty, and is it worth lower raw MC performance?}}
+
+    \vspace{4mm}
+    {\scriptsize Get started: \href{https://gitlab.cern.ch/lvaughan/domain-alignment-toolkit}{\texttt{gitlab.cern.ch/lvaughan/domain-alignment-toolkit}}}
+  \end{center}
 
   \slideheaderfooter
 \end{frame}

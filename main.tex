@@ -121,10 +121,14 @@
 \newcommand{\atlasLogo}{logos/ATLAS-Logo.png}
 
 % ---------- slide metadata ----------
-\title{Nominal-to-Alternate Domain Alignment in SALT/GN3 with Sinkhorn Loss}
-\subtitle{Supervised nominal jet classification plus unsupervised embedding alignment}
-\author{\texorpdfstring{\uline{Luke Vaughan}}{Luke Vaughan}}
-\institute{Argonne National Laboratory}
+\newcommand{\affilmark}[1]{\raisebox{0.45ex}{\fontsize{5}{5}\selectfont #1}}
+\title{GN3 Domain Alignment in SALT}
+\subtitle{Latent-Space Domain Alignment with Sinkhorn Optimal Transport}
+\author{\texorpdfstring{%
+Greta Brianti\affilmark{b}, Walter Hopkins\affilmark{a}, Alexander Khanov\affilmark{c}, Saad Mohiuddin\affilmark{c},\\
+Stephen Mulligan\affilmark{d}, Dylan Rankin\affilmark{e}, Ho Fung Tsoi\affilmark{e}, \uline{Luke Vaughan}\affilmark{a}%
+}{Greta Brianti, Walter Hopkins, Alexander Khanov, Saad Mohiuddin, Stephen Mulligan, Dylan Rankin, Ho Fung Tsoi, Luke Vaughan}}
+\institute{\affilmark{a}Argonne National Laboratory, \affilmark{b}Nikhef, \affilmark{c}Oklahoma State University, \affilmark{d}Universite de Geneve, \affilmark{e}University of Pennsylvania}
 \date{\today}
 
 % ---------- shared small helpers ----------
@@ -180,7 +184,5 @@
 \input{src/title.tex}
 \input{src/sinkhorn_deck.tex}
 \setmainframenumber
-\appendix
-\input{src/sinkhorn_backup.tex}
 
 \end{document}
