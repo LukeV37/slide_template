@@ -1,0 +1,57 @@
+% ============================================================
+%  Slide 1: Autoencoder compression in latent space
+% ============================================================
+\begin{frame}[plain]
+  \slideheader{Autoencoder latent space}
+  \setbeamerfont{itemize/enumerate body}{size=\footnotesize}
+
+  \vspace{13mm}
+  \centering
+  \begin{tikzpicture}[x=1mm,y=1mm,
+      box/.style={draw, rounded corners=1pt, minimum height=8mm, align=center, font=\scriptsize},
+      arr/.style={-{Latex[length=1.6mm]}, thick}]
+    \node[box, fill=black!4,         minimum width=20mm] (x)   at (0,0)   {event\\$\mathbf{x}_i\in\mathbb{R}^{n}$};
+    \node[box, fill=argonneBlue!12,  minimum width=16mm] (enc) at (27,0)  {encoder\\$f_\theta$};
+    \node[box, fill=argonneGreen!25, minimum width=20mm, thick] (z) at (54,0) {latent\\$\mathbf{z}_i\in\mathbb{R}^{m}$};
+    \node[box, fill=argonneBlue!12,  minimum width=16mm] (dec) at (81,0)  {decoder\\$g_\phi$};
+    \node[box, fill=black!4,         minimum width=20mm] (xh)  at (108,0) {output\\$\hat{\mathbf{x}}_i\in\mathbb{R}^{n}$};
+    \draw[arr] (x) -- (enc);
+    \draw[arr] (enc) -- (z);
+    \draw[arr] (z) -- (dec);
+    \draw[arr] (dec) -- (xh);
+    \node[font=\tiny, text=argonneGreen!50!black] at (54,-6.5) {$m<n$: compressed summary};
+    \draw[argonneRed, densely dashed, -{Latex[length=1.4mm]}]
+      (x.north) -- ++(0,3) -| (xh.north);
+    \node[font=\tiny, text=argonneRed, fill=white, inner sep=1pt] at (54,7)
+      {usually only $r_i=\|\mathbf{x}_i-\hat{\mathbf{x}}_i\|^2$ is kept};
+  \end{tikzpicture}
+
+  \vspace{5mm}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.47\textwidth}
+      {\small\textbf{What the autoencoder learns}}\par
+      {\footnotesize
+      \setlength{\abovedisplayskip}{3pt}\setlength{\belowdisplayskip}{0pt}
+      \begin{gather*}
+        \mathbf{z}_i = f_\theta(\mathbf{x}_i)\in\mathbb{R}^{m},\qquad
+        \hat{\mathbf{x}}_i = g_\phi(\mathbf{z}_i)\in\mathbb{R}^{n}\\[1mm]
+        \min_{\theta,\phi}\;\frac{1}{N}\sum_{i=1}^{N}\big\|\mathbf{x}_i-g_\phi(f_\theta(\mathbf{x}_i))\big\|_2^2
+      \end{gather*}\par}
+    \end{column}
+
+    \begin{column}{0.49\textwidth}
+      {\small\textbf{Why look at $\mathbf{z}_i$?}}\par
+      \begin{itemize}
+        \tightlist
+        \item $r_i$: one number per event
+        \item $\mathbf{z}_i$: a structured, $m$-dim description
+        \item Similar $r_i$ can hide very different events
+      \end{itemize}
+    \end{column}
+  \end{columns}
+
+  \vspace{3.0mm}
+  \takeaway{$\mathbf{z}_i$ carries more information than the 1D error $r_i$.}
+
+  \slideheaderfooter
+\end{frame}

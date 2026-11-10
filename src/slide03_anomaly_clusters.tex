@@ -1,0 +1,72 @@
+% ============================================================
+%  Slide 3: Grouping anomalous events in latent space
+% ============================================================
+\begin{frame}[plain]
+  \slideheader{Are anomalies alike?}
+  \setbeamerfont{itemize/enumerate body}{size=\footnotesize}
+
+  \vspace{12mm}
+  \begin{columns}[c,onlytextwidth]
+    \begin{column}{0.46\textwidth}
+      \begin{enumerate}
+        \tightlist
+        \item Flag events with large error: $r_i>\tau$.
+        \item Take their latent vectors $\mathbf{z}_i$.
+        \item Project with t-SNE and highlight the flagged events.
+      \end{enumerate}
+
+      \vspace{1.5mm}
+      \begin{itemize}
+        \tightlist
+        \item \textcolor{argonneRed}{\textbf{Packed together}}: anomalies look alike
+              $\Rightarrow$ likely a common source.
+        \item \textcolor{argonneGreen!70!black}{\textbf{Isolated}}: a one-off
+              unusual event.
+        \item Different clusters $\Rightarrow$ different kinds of anomaly.
+      \end{itemize}
+    \end{column}
+
+    \begin{column}{0.50\textwidth}
+      \centering
+      \begin{tikzpicture}[x=0.8mm,y=0.8mm]
+        \draw[black!40] (0,0) rectangle (60,44);
+        \node[font=\tiny, below] at (30,0) {t-SNE 1};
+        \node[font=\tiny, rotate=90, anchor=south] at (-1,22) {t-SNE 2};
+
+        % normal events (low r_i)
+        \foreach \x/\y in {6/8,8/17,13/12,20/15,22/28,25/9,27/20,29/33,32/13,34/26,37/36,
+                           39/22,42/29,47/23,50/34,53/15,55/27,16/6,24/39,31/7,40/40,49/6,
+                           56/37,5/25,36/5,44/38,9/38,27/41,18/22,45/16,52/40,11/4}
+          {\fill[black!22] (\x,\y) circle (0.9);}
+
+        % anomaly cluster A
+        \foreach \x/\y in {12/31,14/34,17/31,15/36,19/33,13/28,16/29}
+          {\fill[argonneRed] (\x,\y) circle (1.2);}
+        \draw[argonneRed, thick, rounded corners] (9,25) rectangle (22,39);
+        \node[font=\tiny, text=argonneRed, anchor=west] at (23,37) {group A};
+
+        % anomaly cluster B
+        \foreach \x/\y in {39/9,42/11,44/8,46/13,41/14,48/10,43/5}
+          {\fill[argonneBlue] (\x,\y) circle (1.2);}
+        \draw[argonneBlue, thick, rounded corners] (36,2) rectangle (51,17);
+        \node[font=\tiny, text=argonneBlue, anchor=south] at (43.5,17) {group B};
+
+        % isolated anomaly
+        \fill[argonneGreen!70!black] (52,30) circle (1.2);
+        \draw[argonneGreen!70!black, thick] (52,30) circle (3);
+        \node[font=\tiny, text=argonneGreen!70!black, anchor=south] at (52,33) {isolated};
+
+        % legend
+        \node[font=\tiny] at (30,-9)
+          {\textcolor{black!35}{$\bullet$}\,normal ($r_i\le\tau$)\qquad
+           \textcolor{argonneRed}{$\bullet$}\textcolor{argonneBlue}{$\bullet$}\textcolor{argonneGreen!70!black}{$\bullet$}\,anomalous ($r_i>\tau$)};
+      \end{tikzpicture}
+
+    \end{column}
+  \end{columns}
+
+  \vspace{6.0mm}
+  {\centering\color{black}\itshape Conclusion: $r_i$ flags anomalies; latent space shows which belong together.\par}
+
+  \slideheaderfooter
+\end{frame}

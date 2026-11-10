@@ -16,7 +16,7 @@
 
 % ---------- packages ----------
 \usepackage{tikz}
-\usetikzlibrary{positioning,arrows.meta}
+\usetikzlibrary{positioning,arrows.meta,decorations.pathreplacing}
 \usepackage{graphicx}
 \usepackage[T1]{fontenc}
 \usepackage{tgheros}          % TeX Gyre Heros = metric-compatible Helvetica/Arial
@@ -34,6 +34,7 @@
 \setbeamertemplate{itemize subitem}{\color{black}\scriptsize\textendash}
 \setbeamertemplate{itemize subsubitem}{\color{black}\tiny\textendash}
 \setbeamerfont{itemize/enumerate body}{size=\small}
+\setbeamercolor{enumerate item}{fg=black}
 \setbeamerfont{itemize/enumerate subbody}{size=\small}
 
 % ---------- brand colors ----------
@@ -137,8 +138,8 @@
 
 % ---------- shared small helpers ----------
 \newcommand{\takeaway}[1]{%
-  \vspace{1.4mm}%
-  {\small\color{argonneBlue}\textbf{Key message:} #1}\par%
+  \vspace{3.0mm}%
+  {\centering\color{black}\itshape Key message: #1\par}%
 }
 \newcommand{\tightlist}{\setlength{\itemsep}{1.2mm}\setlength{\parskip}{0pt}}
 
@@ -187,8 +188,9 @@
 % ============================================================
 \begin{document}
 
-\input{src/title.tex}
-\input{src/blank.tex}
+\input{src/slide01_latent_representation.tex}
+\input{src/slide02_known_topologies.tex}
+\input{src/slide03_anomaly_clusters.tex}
 
 % Optional backup section pattern:
 % \setmainframenumber
