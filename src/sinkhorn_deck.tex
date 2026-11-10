@@ -25,20 +25,23 @@
   \vspace{9mm}
   \begin{columns}[c,totalwidth=\textwidth]
     \begin{column}{0.54\textwidth}
-      {\small\textbf{MACK/ROCK-style implementation in SALT}}\par
+      {\small\textbf{\href{https://arxiv.org/abs/2410.13947}{MACK}/\href{https://indico.cern.ch/event/1681191/contributions/7078103/attachments/3310052/5924380/FTAGWorkshop_08072026.pdf}{ROCK}-style implementation in SALT}}\par
       \vspace{0.5mm}
       {\scriptsize
       \begin{itemize}\tightlist
         \item shared GN3/SALT transformer backbone for nominal and alternate samples
         \item nominal flavor labels train the classification head
-        \item \texttt{source\_label} domain labels split samples for Sinkhorn OT
+        \item \texttt{source\_label} domain labels split samples for Sinkhorn optimal transport
         \item each jet is represented by \texttt{global\_rep} for both classification and alignment
-        \item Sinkhorn approximates EMD between nominal and alternate latent distributions
+        \item \href{https://arxiv.org/abs/2505.13063}{Optimal transport}, approximated by Sinkhorn loss, aligns nominal and alternate latent distributions with batch-level EMD
       \end{itemize}}
     \end{column}
     \begin{column}{0.43\textwidth}
       \begin{center}
         \includegraphics[height=32mm,keepaspectratio]{figures/mack-v2.jpg}
+
+        \vspace{1mm}
+        {\scriptsize Minimal domain-alignment model.}
       \end{center}
     \end{column}
   \end{columns}
@@ -69,7 +72,7 @@
       \begin{itemize}\tightlist
         \item nominal embeddings
         \item alternate embeddings
-        \item Sinkhorn approximates EMD between the two latent distributions
+        \item Optimal transport, approximated by Sinkhorn loss, compares the two latent distributions
       \end{itemize}
     \end{column}
   \end{columns}
@@ -91,9 +94,9 @@
       \raggedright
       {\small
       \begin{itemize}\tightlist
-        \item \textbf{Config:} sinkhorn loss defined in yaml, set the Sinkhorn weight $\lambda$, and names \texttt{source\_label} as the nominal/alternate domain field.
+        \item \textbf{Config:} the YAML config instantiates the Sinkhorn alignment loss, sets its weight $\lambda$, and uses \texttt{source\_label} to distinguish nominal from alternate jets.
         \item \textbf{CE masking:} in \href{https://gitlab.cern.ch/lvaughan/salt/-/commit/1a56805558753deac3f03e123913c9c708f3dfe9}{\texttt{modelwrapper.py}}, every jet runs through the same GN3 backbone; the wrapper masks the supervised flavor CE so only nominal jets train the classifier head.
-        \item \textbf{Alignment loss:} \href{https://gitlab.cern.ch/lvaughan/salt/-/commit/18b40f4233d9161f3e33831bc5cb4c53c322fdeb}{\texttt{SinkhornDomainAlignmentLoss.py}} takes \texttt{preds["global\_rep"]}, splits embeddings by \texttt{source\_label}, and adds a EMD-like distance between the two latent batches.
+        \item \textbf{Alignment loss:} \href{https://gitlab.cern.ch/lvaughan/salt/-/commit/18b40f4233d9161f3e33831bc5cb4c53c322fdeb}{\texttt{SinkhornDomainAlignmentLoss.py}} takes \texttt{preds["global\_rep"]}, splits embeddings by \texttt{source\_label}, and adds an EMD-like distance between the two latent batches.
       \end{itemize}}
 
     \end{column}
@@ -107,7 +110,7 @@
           \node[box, minimum width=38mm] (backbone) at (30,18) {shared GN3\\[-0.5mm]\scriptsize transformer backbone};
           \node[box, minimum width=38mm] (rep) at (30,0) {\texttt{global\_rep}\\[-0.5mm]\scriptsize jet-level latent vector};
           \node[loss, minimum width=24mm] (ce) at (10,-22) {CE loss\\[-0.5mm]\scriptsize nominal only};
-          \node[loss, minimum width=27mm] (ot) at (50,-22) {Sinkhorn OT\\[-0.5mm]\scriptsize nominal vs alternate};
+          \node[loss, minimum width=27mm] (ot) at (50,-22) {Sinkhorn\\[-0.5mm]\scriptsize optimal transport\\[-0.5mm]\scriptsize nominal vs alternate};
           \draw[arrow] (backbone) -- (rep);
           \draw[arrow] (rep.south west) -- (ce.north);
           \draw[arrow] (rep.south east) -- (ot.north);
